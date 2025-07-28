@@ -1,3 +1,6 @@
 .env
 .venv
 *cache*
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
