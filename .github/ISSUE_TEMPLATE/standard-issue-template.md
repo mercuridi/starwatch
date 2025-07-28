@@ -7,15 +7,6 @@ assignees: ''
 
 ---
 
----
-name: Standard issue template
-about: Standard template with headers to be filled
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ### Description
 
 
