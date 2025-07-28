@@ -1,2 +1,7 @@
 pytest
 pytest-cov
+openmeteo-requests
+retry_requests
+requests_cache
+pandas
+numpy
