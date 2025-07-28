@@ -1,3 +1,4 @@
 from src.example_script import main
 
-assert main()
+def test_actions_working():
+    assert main()
