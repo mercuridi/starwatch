@@ -2,4 +2,5 @@
 .venv
 *cache*
 *.json
+__pycache__
 .coverage
