@@ -54,7 +54,6 @@ def process_current_data(response: WeatherApiResponse) -> None:
         timestamp=current.Time(),
         tz=UTC
     ).strftime('%Y-%m-%d %H:%M:%S')
-
     # Some of this could be used as metrics on the dashboard
     print(f"\nCurrent time:               {current_time}")
     print(f"Current temperature_2m:       {current_temperature_2m}")
