@@ -1,8 +1,9 @@
 # pylint: skip-file
 import os
 import base64
-import requests
+from datetime import datetime, timedelta
 
+import requests
 import pytest
 from unittest.mock import MagicMock, Mock
 
@@ -31,20 +32,21 @@ COORDINATES = {
     "lat": REGION_LATITUDE,
     "lon": REGION_LONGITUDE
 }
-DATE = '2025-07-28'
-TIME = '00:00:00'
+DATE_TODAY = datetime.strptime("2025-07-29", "%Y-%m-%d").date()
+DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
+TIME = datetime.strptime("00:00:00", "%H:%M:%S").time()
 
 def test_make_dump_path(mocker):
     mocker.patch(__name__ + ".os.makedirs", return_value=None)
     assert make_dump_path(DATA_FILEPATH) == "../data/planetary_data.json"
 
 def test_get_positions_url():
-
     assert get_positions_url(
         COORDINATES,
-        DATE,
+        str(DATE_TODAY),
+        str(DATE_WEEK_FROM_NOW),
         TIME
-    ) == "https://api.astronomyapi.com/api/v2/bodies/positions?latitude=40.7128&longitude=-74.006&elevation=0&from_date=2025-07-28&to_date=2025-07-28&time=00:00:00"
+    ) == "https://api.astronomyapi.com/api/v2/bodies/positions?latitude=40.7128&longitude=-74.006&elevation=0&from_date=2025-07-29&to_date=2025-08-04&time=00:00:00"
 
 def test_get_planetary_positions_api_ok(mocker):
     mocker.patch("src.extract_astronomy_data.dump_json_data", return_value=None)
@@ -54,7 +56,8 @@ def test_get_planetary_positions_api_ok(mocker):
     mocker.patch(__name__ + ".requests.get", return_value=api_mock_true)
     assert get_planetary_positions(
         COORDINATES,
-        DATE,
+        str(DATE_TODAY),
+        str(DATE_WEEK_FROM_NOW),
         TIME,
         HEADERS,
         DATA_FILEPATH
@@ -67,7 +70,8 @@ def test_get_planetary_positions_api_down(mocker):
     mocker.patch(__name__ + ".requests.get", return_value=api_mock_false)
     assert get_planetary_positions(
         COORDINATES,
-        DATE,
+        str(DATE_TODAY),
+        str(DATE_WEEK_FROM_NOW),
         TIME,
         HEADERS,
         DATA_FILEPATH
