@@ -34,6 +34,10 @@ COORDINATES = {
 }
 DATE_TODAY = datetime.strptime("2025-07-29", "%Y-%m-%d").date()
 DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
+DATES = {
+    "start": DATE_TODAY,
+    "end": DATE_WEEK_FROM_NOW
+}
 TIME = datetime.strptime("00:00:00", "%H:%M:%S").time()
 
 def test_make_dump_path(mocker):
@@ -43,8 +47,7 @@ def test_make_dump_path(mocker):
 def test_get_positions_url():
     assert get_positions_url(
         COORDINATES,
-        str(DATE_TODAY),
-        str(DATE_WEEK_FROM_NOW),
+        DATES,
         TIME
     ) == "https://api.astronomyapi.com/api/v2/bodies/positions?latitude=40.7128&longitude=-74.006&elevation=0&from_date=2025-07-29&to_date=2025-08-04&time=00:00:00"
 
@@ -56,8 +59,7 @@ def test_get_planetary_positions_api_ok(mocker):
     mocker.patch(__name__ + ".requests.get", return_value=api_mock_true)
     assert get_planetary_positions(
         COORDINATES,
-        str(DATE_TODAY),
-        str(DATE_WEEK_FROM_NOW),
+        DATES,
         TIME,
         HEADERS,
         DATA_FILEPATH
@@ -70,8 +72,7 @@ def test_get_planetary_positions_api_down(mocker):
     mocker.patch(__name__ + ".requests.get", return_value=api_mock_false)
     assert get_planetary_positions(
         COORDINATES,
-        str(DATE_TODAY),
-        str(DATE_WEEK_FROM_NOW),
+        DATES,
         TIME,
         HEADERS,
         DATA_FILEPATH

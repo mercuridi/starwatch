@@ -36,13 +36,16 @@ COORDINATES = {
 }
 DATE_TODAY = datetime.now().date()
 DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
+DATES = {
+    "start": DATE_TODAY,
+    "end": DATE_WEEK_FROM_NOW
+}
 TIME = datetime.now().time().strftime("%H:%M:%S")
 
 
 def get_planetary_positions(
     coordinates: dict[str:float],
-    start_date: str,
-    end_date: str,
+    dates: dict[str:datetime.date],
     time: str,
     header: dict[str:str],
     data_filepath: str
@@ -55,7 +58,7 @@ def get_planetary_positions(
     # String concatenation method to ensure one line
     # is broken into multiple for readability.
     # '+' is optional but included for clarity
-    planetary_positions_url = get_positions_url(coordinates, start_date, end_date, time)
+    planetary_positions_url = get_positions_url(coordinates, dates, time)
 
     response = requests.get(
         planetary_positions_url,
@@ -72,9 +75,9 @@ def handle_response(response: requests.Response, data_filepath: str) -> None:
         json_path = make_dump_path(data_filepath)
         dump_json_data(response, json_path)
         return True
-    else:
-        print(f'Error {response.status_code}, {response.json()}')
-        return False
+
+    print(f'Error {response.status_code}, {response.json()}')
+    return False
 
 
 def dump_json_data(response: requests.Response, json_path: str) -> None:
@@ -101,8 +104,7 @@ def make_dump_path(data_filepath: str) -> str:
 
 def get_positions_url(
         coordinates: dict[str:float],
-        start_date: str,
-        end_date: str,
+        dates: dict[str:datetime.date],
         time: str
     ) -> str:
     """Constructs the API endpoint for the planetary positions data"""
@@ -111,8 +113,8 @@ def get_positions_url(
         + f"?latitude={coordinates["lat"]}"
         + f"&longitude={coordinates["lon"]}"
         + "&elevation=0"
-        + f"&from_date={start_date}"
-        + f"&to_date={end_date}"
+        + f"&from_date={dates["start"]}"
+        + f"&to_date={dates["end"]}"
         + f"&time={time}"
     )
     return planetary_positions_url
@@ -121,8 +123,7 @@ def get_positions_url(
 if __name__ == "__main__":
     get_planetary_positions(
         COORDINATES,
-        str(DATE_TODAY),
-        str(DATE_WEEK_FROM_NOW),
+        DATES,
         str(TIME),
         HEADERS,
         DATA_FILEPATH
