@@ -2,23 +2,60 @@
 import os
 import base64
 import json
+from datetime import datetime, timedelta
 
 import requests
 from dotenv import load_dotenv
 
+load_dotenv()
+# ^ This needs removing from the global namespace before containerisation!!!
+# If you leave this in stuff will start breaking later on - remove ASAP tbh
+# Right now it has to be here because some assignments lower down *need* the
+# .env to be loaded in order to work at all, and if the assignments break nothing happens
+
+# Folder path for the json output
+DATA_FILEPATH = '../data/'
+
+# Authentication method for Astronomy API
+USER_PASS = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
+AUTH_STRING = base64.b64encode(USER_PASS.encode()).decode()
+
+# Set up headers for API request
+HEADERS = {
+    'Authorization': f'Basic {AUTH_STRING}',
+    'Content-Type': 'application/json'
+}
+
+
+# Global variables
+REGION_LATITUDE = +40.7128
+REGION_LONGITUDE = -74.0060
+COORDINATES = {
+    "lat": REGION_LATITUDE,
+    "lon": REGION_LONGITUDE
+}
+DATE_TODAY = datetime.now().date()
+DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
+TIME = datetime.now().time().strftime("%H:%M:%S")
+
+
 def get_planetary_positions(
-        coordinates: dict[str:float],
-        date: str,
-        time: str,
-        header: dict[str:str],
-        data_filepath: str
-    ) -> None:
-    '''Gets information on planetary bodies and saves it to a file as JSON'''
+    coordinates: dict[str:float],
+    start_date: str,
+    end_date: str,
+    time: str,
+    header: dict[str:str],
+    data_filepath: str
+) -> None:
+    '''
+    Gets information on planetary bodies from current day
+    to next 7 days and saves it to a file as JSON
+    '''
 
     # String concatenation method to ensure one line
     # is broken into multiple for readability.
     # '+' is optional but included for clarity
-    planetary_positions_url = get_positions_url(coordinates, date, time)
+    planetary_positions_url = get_positions_url(coordinates, start_date, end_date, time)
 
     response = requests.get(
         planetary_positions_url,
@@ -62,56 +99,31 @@ def make_dump_path(data_filepath: str) -> str:
     return json_path
 
 
-def get_positions_url(coordinates: dict[str:float], date: str, time: str) -> str:
+def get_positions_url(
+        coordinates: dict[str:float],
+        start_date: str,
+        end_date: str,
+        time: str
+    ) -> str:
     """Constructs the API endpoint for the planetary positions data"""
     planetary_positions_url: str = (
         "https://api.astronomyapi.com/api/v2/bodies/positions"
         + f"?latitude={coordinates["lat"]}"
         + f"&longitude={coordinates["lon"]}"
         + "&elevation=0"
-        + f"&from_date={date}"
-        + f"&to_date={date}"
+        + f"&from_date={start_date}"
+        + f"&to_date={end_date}"
         + f"&time={time}"
     )
     return planetary_positions_url
 
 
-load_dotenv()
-# ^ This needs removing from the global namespace before containerisation!!!
-# If you leave this in stuff will start breaking later on - remove ASAP tbh
-# Right now it has to be here because some assignments lower down *need* the
-# .env to be loaded in order to work at all, and if the assignments break nothing happens
-
-# Folder path for the json output
-DATA_FILEPATH = '../data/'
-
-# Authentication method for Astronomy API
-USER_PASS = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
-AUTH_STRING = base64.b64encode(USER_PASS.encode()).decode()
-
-# Set up headers for API request
-HEADERS = {
-    'Authorization': f'Basic {AUTH_STRING}',
-    'Content-Type': 'application/json'
-}
-
-# Global constants
-# Latitude and longitude are placeholders
-REGION_LATITUDE = +40.7128
-REGION_LONGITUDE = -74.0060
-COORDINATES = {
-    "lat": REGION_LATITUDE,
-    "lon": REGION_LONGITUDE
-}
-DATE = '2025-07-28'
-TIME = '00:00:00'
-
-
 if __name__ == "__main__":
     get_planetary_positions(
         COORDINATES,
-        DATE,
-        TIME,
+        str(DATE_TODAY),
+        str(DATE_WEEK_FROM_NOW),
+        str(TIME),
         HEADERS,
         DATA_FILEPATH
     )
