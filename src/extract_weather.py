@@ -46,6 +46,7 @@ def process_current_data(response):
     current_precipitation = current.Variables(4).Value()
     current_cloud_cover = current.Variables(5).Value()
 
+    # Some of this could be used as metrics on the dashboard
     print(
         f"\nCurrent time: {datetime.fromtimestamp(current.Time(),
                                                   UTC).strftime('%Y-%m-%d %H:%M:%S')}")
@@ -78,6 +79,7 @@ def process_hourly_data(response) -> pd.DataFrame:
 
     hourly_dataframe = pd.DataFrame(data=hourly_data)
 
+    # Determines current hour and slices the df from this point +24 hours
     current_hour = datetime.now().hour
     return hourly_dataframe.iloc[current_hour:current_hour+24]
 
