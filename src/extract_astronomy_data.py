@@ -77,8 +77,8 @@ if __name__ == "__main__":
     get_planetary_positions(
         REGION_LATITUDE,
         REGION_LONGITUDE,
-        str(DATE_TODAY),
-        str(DATE_WEEK_FROM_NOW),
-        str(TIME),
+        DATE_TODAY,
+        DATE_WEEK_FROM_NOW,
+        TIME,
         HEADERS
     )
