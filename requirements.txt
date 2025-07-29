@@ -3,3 +3,8 @@ pytest-cov
 pylint
 python-dotenv
 requests
+openmeteo-requests
+requests-cache
+retry-requests
+numpy
+pandas
