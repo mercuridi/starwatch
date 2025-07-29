@@ -1,7 +1,9 @@
 """Extract script for the Open-Meteo API"""
 
 from datetime import datetime, UTC
+
 import openmeteo_requests
+from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
 import pandas as pd
 import requests_cache
 from retry_requests import retry
@@ -10,13 +12,15 @@ from retry_requests import retry
 def get_client(cache_expiry: int) -> openmeteo_requests.Client:
     """Returns Open-Meteo requests client"""
     cache_session = requests_cache.CachedSession(
-        '.cache', expire_after=cache_expiry)
+        '.cache', expire_after=cache_expiry
+    )
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 
     return openmeteo_requests.Client(session=retry_session)
 
 
-def get_response(latitude: float, longitude: float, client: openmeteo_requests.Client):
+def get_response(latitude: float, longitude: float,
+                 client: openmeteo_requests.Client) -> WeatherApiResponse:
     """Returns a response, provided with latitude, longitude, and an Open-Meteo requests client"""
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
@@ -36,7 +40,7 @@ def get_response(latitude: float, longitude: float, client: openmeteo_requests.C
     return client.weather_api(url, params=params)[0]
 
 
-def process_current_data(response):
+def process_current_data(response: WeatherApiResponse) -> None:
     """Prints current weather data from the API response"""
     current = response.Current()
     current_temperature_2m = current.Variables(0).Value()
@@ -46,19 +50,22 @@ def process_current_data(response):
     current_precipitation = current.Variables(4).Value()
     current_cloud_cover = current.Variables(5).Value()
 
+    current_time = datetime.fromtimestamp(
+        timestamp=current.Time(),
+        tz=UTC
+    ).strftime('%Y-%m-%d %H:%M:%S')
+
     # Some of this could be used as metrics on the dashboard
-    print(
-        f"\nCurrent time: {datetime.fromtimestamp(current.Time(),
-                                                  UTC).strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Current temperature_2m: {current_temperature_2m}")
+    print(f"\nCurrent time:               {current_time}")
+    print(f"Current temperature_2m:       {current_temperature_2m}")
     print(f"Current relative_humidity_2m: {current_relative_humidity_2m}")
-    print(f"Current wind_speed_10m: {current_wind_speed_10m}")
-    print(f"Current wind_gusts_10m: {current_wind_gusts_10m}")
-    print(f"Current precipitation: {current_precipitation}")
-    print(f"Current cloud_cover: {current_cloud_cover}")
+    print(f"Current wind_speed_10m:       {current_wind_speed_10m}")
+    print(f"Current wind_gusts_10m:       {current_wind_gusts_10m}")
+    print(f"Current precipitation:        {current_precipitation}")
+    print(f"Current cloud_cover:          {current_cloud_cover}")
 
 
-def process_hourly_data(response) -> pd.DataFrame:
+def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
     """Returns a dataframe containing 24 hours of weather information starting from 
     the current hour, from an API response.
     """
@@ -86,11 +93,10 @@ def process_hourly_data(response) -> pd.DataFrame:
 
 def convert_unix_timestamp(unix_timestamp: int) -> str:
     """Returns unix timestamp as a datetime string"""
-    return datetime.fromtimestamp(
-        unix_timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.fromtimestamp(unix_timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S')
 
 
-def process_daily_data(response):
+def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
     """Returns a dataframe for daily averages of weather data from an API response"""
     daily = response.Daily()
     daily_data = {"Date": pd.date_range(
@@ -107,8 +113,7 @@ def process_daily_data(response):
     daily_data["Minimum Temperature (°C)"] = daily.Variables(5).ValuesAsNumpy()
 
     df = pd.DataFrame(data=daily_data)
-    df["Sunrise"] = df["Sunrise"].apply(
-        convert_unix_timestamp)
+    df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
     df["Sunset"] = df["Sunset"].apply(convert_unix_timestamp)
     return df
 
