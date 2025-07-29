@@ -26,25 +26,33 @@ def get_planetary_positions(
         timeout=20
     )
 
-    handle_response(response, data_filepath)
+    return handle_response(response, data_filepath)
 
 
 def handle_response(response: requests.Response, data_filepath: str) -> None:
     """Handles the API response; prints errors on fail and dumps to JSON on success"""
     if response.status_code == 200:
-        json_path = handle_dump_path(data_filepath)
+        json_path = make_dump_path(data_filepath)
         dump_json_data(response, json_path)
+        return True
     else:
         print(f'Error {response.status_code}, {response.json()}')
+        return False
 
 
 def dump_json_data(response: requests.Response, json_path: str) -> None:
     """Dumps data in a context manager to ensure proper closing"""
+    if not isinstance(response, requests.Response):
+        raise TypeError(f"Expected to serialise a Response object, got {type(response)}")
+    if not isinstance(json_path, str):
+        raise TypeError("Passed json_path must be a string")
+    if len(json_path) == 0:
+        raise ValueError("Given empty string for json_path")
     with open(json_path, 'w',  encoding='utf-8') as f:
         json.dump(response.json(), f, indent=2)
 
 
-def handle_dump_path(data_filepath: str) -> str:
+def make_dump_path(data_filepath: str) -> str:
     """Ensures the data directory exists and returns a path to it"""
     os.makedirs(data_filepath, exist_ok=True)
     json_path = os.path.join(
@@ -65,38 +73,43 @@ def get_positions_url(coordinates: dict[str:float], date: str, time: str) -> str
         + f"&to_date={date}"
         + f"&time={time}"
     )
-
     return planetary_positions_url
 
 
+load_dotenv()
+# ^ This needs removing from the global namespace before containerisation!!!
+# If you leave this in stuff will start breaking later on - remove ASAP tbh
+# Right now it has to be here because some assignments lower down *need* the
+# .env to be loaded in order to work at all, and if the assignments break nothing happens
+
+# Folder path for the json output
+DATA_FILEPATH = '../data/'
+
+# Authentication method for Astronomy API
+USER_PASS = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
+AUTH_STRING = base64.b64encode(USER_PASS.encode()).decode()
+
+# Set up headers for API request
+HEADERS = {
+    'Authorization': f'Basic {AUTH_STRING}',
+    'Content-Type': 'application/json'
+}
+
+# Global constants
+# Latitude and longitude are placeholders
+REGION_LATITUDE = +40.7128
+REGION_LONGITUDE = -74.0060
+COORDINATES = {
+    "lat": REGION_LATITUDE,
+    "lon": REGION_LONGITUDE
+}
+DATE = '2025-07-28'
+TIME = '00:00:00'
+
+
 if __name__ == "__main__":
-    load_dotenv()
-
-    # Folder path for the json output
-    DATA_FILEPATH = '../data/'
-
-    # Authentication method for Astronomy API
-    USER_PASS = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
-    AUTH_STRING = base64.b64encode(USER_PASS.encode()).decode()
-
-    # Set up headers for API request
-    HEADERS = {
-        'Authorization': f'Basic {AUTH_STRING}',
-        'Content-Type': 'application/json'
-    }
-
-    # Global constants
-    # Latitude and longitude are placeholders
-    REGION_LATITUDE = +40.7128
-    REGION_LONGITUDE = -74.0060
-    DATE = '2025-07-28'
-    TIME = '00:00:00'
-
     get_planetary_positions(
-        {
-            "lat": REGION_LATITUDE,
-            "lon": REGION_LONGITUDE
-        },
+        COORDINATES,
         DATE,
         TIME,
         HEADERS,
