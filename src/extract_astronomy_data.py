@@ -5,6 +5,7 @@ import json
 
 import requests
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -21,21 +22,24 @@ HEADERS = {
     'Content-Type': 'application/json'
 }
 
+
 # Global variables
 REGION_LATITUDE = +40.7128
 REGION_LONGITUDE = -74.0060
-DATE = '2025-07-28'
-TIME = '00:00:00'
+DATE_TODAY = datetime.now().date()
+DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
+TIME = datetime.now().time().strftime("%H:%M:%S")
 
 
 def get_planetary_positions(
     lat: float,
     lon: float,
-    date: str,
+    start_date: str,
+    end_date: str,
     time: str,
     header: dict[str:str]
 ) -> None:
-    '''Gets information on planetary bodies and saves it to a file as JSON'''
+    '''Gets information on planetary bodies from current day to next 7 days and saves it to a file as JSON'''
 
     # String concatenation method to ensure one line is broken into multiple for readability.
     # '+' is optional but included for clarity
@@ -44,8 +48,8 @@ def get_planetary_positions(
         + f"?latitude={lat}"
         + f"&longitude={lon}"
         + "&elevation=0"
-        + f"&from_date={date}"
-        + f"&to_date={date}"
+        + f"&from_date={start_date}"
+        + f"&to_date={end_date}"
         + f"&time={time}"
     )
 
@@ -73,7 +77,8 @@ if __name__ == "__main__":
     get_planetary_positions(
         REGION_LATITUDE,
         REGION_LONGITUDE,
-        DATE,
+        DATE_TODAY,
+        DATE_WEEK_FROM_NOW,
         TIME,
         HEADERS
     )
