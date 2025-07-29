@@ -33,7 +33,7 @@ resource "aws_security_group" "c18-starwatch-security-group" {
 
 resource "aws_db_instance" "c18-starwatch-rds" {
   identifier         = var.db_identifier
-  allocated_storage  = 20
+  allocated_storage  = 20 # GiB
   engine             = "postgres"
   engine_version     = "15.5"
   instance_class     = "db.t3.micro"
