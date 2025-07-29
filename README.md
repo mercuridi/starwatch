@@ -33,7 +33,10 @@ In your terminal at the top level of the project:
 3. Run pytest coverage checks: `python3 -m pytest --cov=src test/`
 4. Run pylint: `python3 -m pylint *.py`
 
-### Terraform
+## Terraform
+This folder contains the sub-folders: `rds_tf` and `s3_tf`
+
+### `rds_tf`
 This folder contains two files: `main.tf` and `variables.tf`
 
 #### `main.tf`
@@ -55,5 +58,24 @@ db_identifier      = your_sql_server_host
 db_name        = your_database_name
 db_username    = your_database_username
 db_password    = your_database_password
+
+```
+### `s3_tf`
+This folder contains two files: `main.tf` and `variables.tf`
+
+#### `main.tf`
+Contains the config to setup an S3 bucket with public access blocked on AWS.
+
+#### `variables.tf`
+Defines the variables needed to provision the S3 bucket.
+
+**Prerequisites:**
+
+`terraform.tfvars` file containing:
+
+```
+aws_region        = your_aws_region
+
+s3_bucket_name       = your_s3_bucket_name
 
 ```
