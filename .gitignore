@@ -1,6 +1,11 @@
 .env
 .venv
 *cache*
+
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+
 *.json
 __pycache__
 .coverage
