@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv('src/.env')
 
 # Authentication method for Astronomy API
-user_pass = f"{os.environ.get('applicationId')}:{os.environ.get("applicationSecret")}"
+user_pass = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
 auth_string = base64.b64encode(user_pass.encode()).decode()
 
 
