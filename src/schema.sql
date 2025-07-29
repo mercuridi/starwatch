@@ -21,8 +21,8 @@ CREATE TABLE planetary_body (
 -- Distance table
 CREATE TABLE distance (
     distance_id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    kilometres FLOAT,
-    planetary_body_id INT,
+    kilometres FLOAT NOT NULL,
+    planetary_body_id INT NOT NULL,
     PRIMARY KEY (distance_id),
     FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id)
 );
@@ -35,7 +35,14 @@ CREATE TABLE forecast (
     latitude FLOAT NOT NULL,
     planetary_body_id INT NOT NULL,
     constellation_id INT,
-
+    right_ascension_hours FLOAT,
+    right_ascension_string TEXT,
+    declination_degrees FLOAT,
+    declination_string TEXT,
+    altitude_degrees FLOAT,
+    altitude_string TEXT,
+    azimuth_degrees FLOAT,
+    azimuth_string TEXT,
     PRIMARY KEY (forecast_id),
     FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id),
     FOREIGN KEY (constellation_id) REFERENCES constellation(constellation_id)
