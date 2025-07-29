@@ -1,6 +1,7 @@
-import openmeteo_requests
+"""Extract script for the Open-Meteo API"""
 
 from datetime import datetime, UTC
+import openmeteo_requests
 import pandas as pd
 import requests_cache
 from retry_requests import retry
@@ -36,6 +37,7 @@ def get_response(latitude: float, longitude: float, client: openmeteo_requests.C
 
 
 def process_current_data(response):
+    """Prints current weather data from the API response"""
     current = response.Current()
     current_temperature_2m = current.Variables(0).Value()
     current_relative_humidity_2m = current.Variables(1).Value()
@@ -45,7 +47,8 @@ def process_current_data(response):
     current_cloud_cover = current.Variables(5).Value()
 
     print(
-        f"\nCurrent time: {datetime.fromtimestamp(current.Time(), UTC).strftime('%Y-%m-%d %H:%M:%S')}")
+        f"\nCurrent time: {datetime.fromtimestamp(current.Time(),
+                                                  UTC).strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Current temperature_2m: {current_temperature_2m}")
     print(f"Current relative_humidity_2m: {current_relative_humidity_2m}")
     print(f"Current wind_speed_10m: {current_wind_speed_10m}")
@@ -55,7 +58,9 @@ def process_current_data(response):
 
 
 def process_hourly_data(response) -> pd.DataFrame:
-    """Returns dataframe containing 24 hours of weather information, from the current hour"""
+    """Returns a dataframe containing 24 hours of weather information starting from 
+    the current hour, from an API response.
+    """
     hourly = response.Hourly()
     hourly_data = {"Date": pd.date_range(
         start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
@@ -78,12 +83,13 @@ def process_hourly_data(response) -> pd.DataFrame:
 
 
 def convert_unix_timestamp(unix_timestamp: int) -> str:
-    """Returns unix timestamp as datetime string"""
+    """Returns unix timestamp as a datetime string"""
     return datetime.fromtimestamp(
         unix_timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def process_daily_data(response):
+    """Returns a dataframe for daily averages of weather data from an API response"""
     daily = response.Daily()
     daily_data = {"Date": pd.date_range(
         start=pd.to_datetime(daily.Time(), unit="s", utc=True),
@@ -91,7 +97,6 @@ def process_daily_data(response):
         freq=pd.Timedelta(seconds=daily.Interval()),
         inclusive="left"
     )}
-
     daily_data["Sunrise"] = daily.Variables(0).ValuesInt64AsNumpy()
     daily_data["Sunset"] = daily.Variables(1).ValuesInt64AsNumpy()
     daily_data["Maximum Wind Speed (km/h)"] = daily.Variables(2).ValuesAsNumpy()
@@ -100,12 +105,14 @@ def process_daily_data(response):
     daily_data["Minimum Temperature (°C)"] = daily.Variables(5).ValuesAsNumpy()
 
     df = pd.DataFrame(data=daily_data)
-    df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
+    df["Sunrise"] = df["Sunrise"].apply(
+        convert_unix_timestamp)
     df["Sunset"] = df["Sunset"].apply(convert_unix_timestamp)
     return df
 
 
 def main():
+    """Main function"""
     client = get_client(3600)
     response = get_response(51.5085, -0.1257, client)
 
