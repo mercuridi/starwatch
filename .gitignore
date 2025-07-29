@@ -1,4 +1,11 @@
 .env
 .venv
 *cache*
-src/planetary_positions.json
+
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+
+*.json
+__pycache__
+.coverage
