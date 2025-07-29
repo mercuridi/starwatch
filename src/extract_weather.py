@@ -43,12 +43,12 @@ def get_response(latitude: float, longitude: float,
 def process_current_data(response: WeatherApiResponse) -> None:
     """Prints current weather data from the API response"""
     current = response.Current()
-    current_temperature_2m          = current.Variables(0).Value()
-    current_relative_humidity_2m    = current.Variables(1).Value()
-    current_wind_speed_10m          = current.Variables(2).Value()
-    current_wind_gusts_10m          = current.Variables(3).Value()
-    current_precipitation           = current.Variables(4).Value()
-    current_cloud_cover             = current.Variables(5).Value()
+    current_temperature_2m       = current.Variables(0).Value()
+    current_relative_humidity_2m = current.Variables(1).Value()
+    current_wind_speed_10m       = current.Variables(2).Value()
+    current_wind_gusts_10m       = current.Variables(3).Value()
+    current_precipitation        = current.Variables(4).Value()
+    current_cloud_cover          = current.Variables(5).Value()
 
     current_time = datetime.fromtimestamp(
         timestamp=current.Time(),
@@ -75,13 +75,13 @@ def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
         freq=pd.Timedelta(seconds=hourly.Interval()),
         inclusive="left"
     )}
-    hourly_data["Temperature (°C)"] = hourly.Variables(0).ValuesAsNumpy()
+    hourly_data["Temperature (°C)"]      = hourly.Variables(0).ValuesAsNumpy()
     hourly_data["Relative Humidity (%)"] = hourly.Variables(1).ValuesAsNumpy()
-    hourly_data["Precipitation (mm)"] = hourly.Variables(2).ValuesAsNumpy()
-    hourly_data["Wind Speed (km/h)"] = hourly.Variables(3).ValuesAsNumpy()
-    hourly_data["Wind Gusts (km/h)"] = hourly.Variables(4).ValuesAsNumpy()
-    hourly_data["Visibility (m)"] = hourly.Variables(5).ValuesAsNumpy()
-    hourly_data["Cloud Cover (%)"] = hourly.Variables(6).ValuesAsNumpy()
+    hourly_data["Precipitation (mm)"]    = hourly.Variables(2).ValuesAsNumpy()
+    hourly_data["Wind Speed (km/h)"]     = hourly.Variables(3).ValuesAsNumpy()
+    hourly_data["Wind Gusts (km/h)"]     = hourly.Variables(4).ValuesAsNumpy()
+    hourly_data["Visibility (m)"]        = hourly.Variables(5).ValuesAsNumpy()
+    hourly_data["Cloud Cover (%)"]       = hourly.Variables(6).ValuesAsNumpy()
 
     hourly_dataframe = pd.DataFrame(data=hourly_data)
 
@@ -104,12 +104,12 @@ def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
         freq=pd.Timedelta(seconds=daily.Interval()),
         inclusive="left"
     )}
-    daily_data["Sunrise"] = daily.Variables(0).ValuesInt64AsNumpy()
-    daily_data["Sunset"] = daily.Variables(1).ValuesInt64AsNumpy()
+    daily_data["Sunrise"]                   = daily.Variables(0).ValuesInt64AsNumpy()
+    daily_data["Sunset"]                    = daily.Variables(1).ValuesInt64AsNumpy()
     daily_data["Maximum Wind Speed (km/h)"] = daily.Variables(2).ValuesAsNumpy()
     daily_data["Maximum Wind Gusts (km/h)"] = daily.Variables(3).ValuesAsNumpy()
-    daily_data["Maximum Temperature (°C)"] = daily.Variables(4).ValuesAsNumpy()
-    daily_data["Minimum Temperature (°C)"] = daily.Variables(5).ValuesAsNumpy()
+    daily_data["Maximum Temperature (°C)"]  = daily.Variables(4).ValuesAsNumpy()
+    daily_data["Minimum Temperature (°C)"]  = daily.Variables(5).ValuesAsNumpy()
 
     df = pd.DataFrame(data=daily_data)
     df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
