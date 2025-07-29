@@ -30,7 +30,7 @@ Ensure you have Python 3 installed. Recommended version minimum 3.10 (matches CI
 In your terminal at the top level of the project:
 1. Install requirements: `pip3 install -r requirements.txt`
 2. Run pytest: `python3 -m pytest test/`
-3. Run pytest coverage checks: `python3 -m pytest --cov=src test/`
+3. Run pytest coverage checks: `python3 -m pytest --cov=src --cov-report term-missing test/`
 4. Run pylint: `python3 -m pylint *.py`
 
 ### Terraform
