@@ -40,8 +40,8 @@ resource "aws_db_instance" "c18-starwatch-rds" {
   username           = var.db_username
   password           = var.db_password
   port               = var.db_port
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.default.name
+  vpc_security_group_ids = [aws_security_group.c18-starwatch-security-group.id]
+  db_subnet_group_name   = aws_db_subnet_group.c18-starwatch-subnet-group.name
   publicly_accessible    = false
   skip_final_snapshot    = true
 
