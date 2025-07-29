@@ -2,7 +2,7 @@ provider "aws" {
   region  = var.aws_region
 }
 
-resource "aws_db_subnet_group" "default" {
+resource "aws_db_subnet_group" "c18-starwatch-subnet-group" {
   name       = "c18-starwatch-subnet-group"
   subnet_ids = var.private_subnet_ids
 
@@ -11,7 +11,7 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
-resource "aws_security_group" "rds_sg" {
+resource "aws_security_group" "c18-starwatch-security-group" {
   name        = "c18-starwatch-sg"
   description = "Allow DB access"
   vpc_id      = "vpc-0adcb6a62ca552c01"
@@ -31,7 +31,7 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
-resource "aws_db_instance" "default" {
+resource "aws_db_instance" "c18-starwatch-rds" {
   identifier         = var.db_identifier
   allocated_storage  = 20
   engine             = "postgres"
