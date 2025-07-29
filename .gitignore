@@ -1,4 +1,5 @@
 .env
 .venv
 *cache*
-src/planetary_positions.json
+*.json
+.coverage
