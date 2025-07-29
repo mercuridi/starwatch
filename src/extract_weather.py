@@ -43,12 +43,12 @@ def get_response(latitude: float, longitude: float,
 def process_current_data(response: WeatherApiResponse) -> None:
     """Prints current weather data from the API response"""
     current = response.Current()
-    current_temperature_2m = current.Variables(0).Value()
-    current_relative_humidity_2m = current.Variables(1).Value()
-    current_wind_speed_10m = current.Variables(2).Value()
-    current_wind_gusts_10m = current.Variables(3).Value()
-    current_precipitation = current.Variables(4).Value()
-    current_cloud_cover = current.Variables(5).Value()
+    current_temperature_2m          = current.Variables(0).Value()
+    current_relative_humidity_2m    = current.Variables(1).Value()
+    current_wind_speed_10m          = current.Variables(2).Value()
+    current_wind_gusts_10m          = current.Variables(3).Value()
+    current_precipitation           = current.Variables(4).Value()
+    current_cloud_cover             = current.Variables(5).Value()
 
     current_time = datetime.fromtimestamp(
         timestamp=current.Time(),
