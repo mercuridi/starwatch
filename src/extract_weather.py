@@ -47,9 +47,12 @@ def process_current_data(response):
     current_cloud_cover = current.Variables(5).Value()
 
     # Some of this could be used as metrics on the dashboard
-    print(
-        f"\nCurrent time: {datetime.fromtimestamp(current.Time(),
-                                                  UTC).strftime('%Y-%m-%d %H:%M:%S')}")
+    current_time = datetime.fromtimestamp(
+        timestamp=current.Time(),
+        tz=UTC
+    ).strftime('%Y-%m-%d %H:%M:%S')
+
+    print(f"\nCurrent time: {current_time}")
     print(f"Current temperature_2m: {current_temperature_2m}")
     print(f"Current relative_humidity_2m: {current_relative_humidity_2m}")
     print(f"Current wind_speed_10m: {current_wind_speed_10m}")
