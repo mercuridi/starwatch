@@ -5,20 +5,6 @@ import pandas as pd
 def main():
     """Driver function"""
 
-    # Regions:
-    # • Cymru Wales
-    # • East Midlands
-    # • East of England
-    # • London
-    # • North East & Cumbria
-    # • North West
-    # • Northern Ireland
-    # • Scotland
-    # • South East
-    # • South West
-    # • West Midlands
-    # • Yorkshire & the Humber
-
     # lat/long pairs snatched from Wikipedia
     regions = {
         "region_name"   : [
