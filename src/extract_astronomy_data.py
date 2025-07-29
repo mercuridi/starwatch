@@ -6,8 +6,6 @@ import json
 import requests
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Folder path for the json output
 DATA_FILE_PATH = 'data'
 
@@ -70,6 +68,7 @@ def get_planetary_positions(
 
 
 if __name__ == "__main__":
+    load_dotenv()
     get_planetary_positions(
         REGION_LATITUDE,
         REGION_LONGITUDE,
