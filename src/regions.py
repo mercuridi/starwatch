@@ -65,7 +65,7 @@ def main():
         ]
     }
     df = pd.DataFrame(data=regions)
-    df.to_json(path_or_buf="regions.json")
+    df.to_json(path_or_buf="data/regions.json")
 
 if __name__ == "__main__":
     main()
