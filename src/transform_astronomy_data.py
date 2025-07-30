@@ -24,7 +24,6 @@ def filter_data(json_data: dict) -> pd.DataFrame:
     Converts dictionary into a dataframe and returns
     '''
     longitude = json_data['data']['observer']['location']['longitude']
-    longitude = json_data['data']['observer']['location']['longitude']
     latitude = json_data['data']['observer']['location']['latitude']
     data_of_planetary_bodies = json_data['data']['table']['rows']
 
