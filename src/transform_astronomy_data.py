@@ -14,12 +14,13 @@ def get_json_data(file_path: str) -> dict:
         with open(file_path, 'r', encoding='utf-8') as file:
             return json.load(file)
     except FileNotFoundError:
-        return 'Error, No file found'
+        print('Error, No file found')
+        return None
 
 
 def filter_data(json_data: dict) -> pd.DataFrame:
     '''
-    Takes in JSON and filters for required data as key value pairs in a dictionary
+    Takes in JSON and filters for required data as key value pairs in a list of dictionaries
     Converts dictionary into a dataframe and returns
     '''
     longitude = json_data['data']['observer']['location']['longitude']
@@ -31,7 +32,7 @@ def filter_data(json_data: dict) -> pd.DataFrame:
         name = planetary_body['entry']['name']
 
         for record in planetary_body['cells']:
-            # Creates dict of all relevant data from JSON
+            # Creates list of dictionaries of all relevant data from JSON
             records.append({
                 # Gets date in YYYY-MM-DD
                 "date": record['date'].split("T")[0],
