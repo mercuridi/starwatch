@@ -1,4 +1,4 @@
-"""Extract script for the Open-Meteo API"""
+"""Extract script for the Open-Meteo API data"""
 
 from datetime import datetime, UTC
 
@@ -40,9 +40,10 @@ def get_response(latitude: float, longitude: float,
     return client.weather_api(url, params=params)[0]
 
 
-def process_current_data(response: WeatherApiResponse) -> None:
-    """Prints current weather data from the API response"""
+def process_current_data(response: WeatherApiResponse) -> tuple[float]:
+    """Returns tuple listing the current weather data from the API response"""
     current = response.Current()
+
     current_temperature_2m       = current.Variables(0).Value()
     current_relative_humidity_2m = current.Variables(1).Value()
     current_wind_speed_10m       = current.Variables(2).Value()
@@ -50,18 +51,9 @@ def process_current_data(response: WeatherApiResponse) -> None:
     current_precipitation        = current.Variables(4).Value()
     current_cloud_cover          = current.Variables(5).Value()
 
-    current_time = datetime.fromtimestamp(
-        timestamp=current.Time(),
-        tz=UTC
-    ).strftime('%Y-%m-%d %H:%M:%S')
-    # Some of this could be used as metrics on the dashboard
-    print(f"\nCurrent time:               {current_time}")
-    print(f"Current temperature_2m:       {current_temperature_2m}")
-    print(f"Current relative_humidity_2m: {current_relative_humidity_2m}")
-    print(f"Current wind_speed_10m:       {current_wind_speed_10m}")
-    print(f"Current wind_gusts_10m:       {current_wind_gusts_10m}")
-    print(f"Current precipitation:        {current_precipitation}")
-    print(f"Current cloud_cover:          {current_cloud_cover}")
+    return (current_temperature_2m, current_relative_humidity_2m, current_wind_speed_10m,
+            current_wind_gusts_10m, current_precipitation, current_cloud_cover)
+
 
 
 def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
@@ -69,6 +61,7 @@ def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
     the current hour, from an API response.
     """
     hourly = response.Hourly()
+
     hourly_data = {"Date": pd.date_range(
         start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
         end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
@@ -117,15 +110,16 @@ def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
     return df
 
 
+# the main function can be removed as it only provides an example
+# functions are imported to other scripts
 def main():
     """Main function"""
     client = get_client(3600)
-    response = get_response(51.5085, -0.1257, client)
+    response = get_response(55.00, -1.87, client)
 
-    process_current_data(response)
+    print(process_current_data(response))
     print(process_hourly_data(response))
     print(process_daily_data(response))
-
 
 if __name__ == "__main__":
     main()
