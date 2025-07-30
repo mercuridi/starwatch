@@ -28,9 +28,12 @@ def filter_data(json_data: dict) -> pd.DataFrame:
     data_of_planetary_bodies = json_data['data']['table']['rows']
 
     records = []
+
+    # Loops for each planet/star
     for planetary_body in data_of_planetary_bodies:
         name = planetary_body['entry']['name']
 
+        # Loops for each date
         for record in planetary_body['cells']:
             # Creates list of dictionaries of all relevant data from JSON
             records.append({
