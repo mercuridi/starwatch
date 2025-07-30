@@ -5,7 +5,7 @@
 import json
 import pandas as pd
 
-FILE_PATH = "data/planetary_data.json"
+FILE_PATH = "src/data/planetary_data.json"
 
 
 def get_json_data(file_path: str) -> dict:
@@ -24,8 +24,8 @@ def filter_data(json_data: dict) -> pd.DataFrame:
     Converts dictionary into a dataframe and returns
     '''
     longitude = json_data['data']['observer']['location']['longitude']
-    longitude   = json_data['data']['observer']['location']['longitude']
-    latitude    = json_data['data']['observer']['location']['latitude']
+    longitude = json_data['data']['observer']['location']['longitude']
+    latitude = json_data['data']['observer']['location']['latitude']
     data_of_planetary_bodies = json_data['data']['table']['rows']
 
     records = []
