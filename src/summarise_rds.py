@@ -6,7 +6,7 @@ import psycopg2
 import pandas as pd
 
 # TODO
-# Download data from RDS
+# Download data from RDS (DONE)
 # Make a summary table of the downloaded data
 # Convert to JSON
 # Send the JSON to the S3 bucket, named for its day
