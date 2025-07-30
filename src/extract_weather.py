@@ -108,18 +108,3 @@ def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
     df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
     df["Sunset"] = df["Sunset"].apply(convert_unix_timestamp)
     return df
-
-
-# the main function can be removed as it only provides an example
-# functions are imported to other scripts
-def main():
-    """Main function"""
-    client = get_client(3600)
-    response = get_response(55.00, -1.87, client)
-
-    print(process_current_data(response))
-    print(process_hourly_data(response))
-    print(process_daily_data(response))
-
-if __name__ == "__main__":
-    main()
