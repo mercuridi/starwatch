@@ -49,7 +49,7 @@ def get_planetary_positions(
     time: str,
     header: dict[str:str],
     data_filepath: str
-) -> None:
+) -> bool:
     '''
     Gets information on planetary bodies from current day
     to next 7 days and saves it to a file as JSON
@@ -69,7 +69,7 @@ def get_planetary_positions(
     return handle_response(response, data_filepath)
 
 
-def handle_response(response: requests.Response, data_filepath: str) -> None:
+def handle_response(response: requests.Response, data_filepath: str) -> bool:
     """Handles the API response; prints errors on fail and dumps to JSON on success"""
     if response.status_code == 200:
         json_path = make_dump_path(data_filepath)
