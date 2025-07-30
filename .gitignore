@@ -5,6 +5,7 @@
 terraform.tfvars
 *.tfstate
 *.tfstate.backup
+**/.terraform/*
 
 *.json
 __pycache__
