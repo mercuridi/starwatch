@@ -15,7 +15,7 @@ def get_json_data(file_path: str) -> dict:
             return json.load(file)
     except FileNotFoundError:
         print('Error, No file found')
-        return None
+        return {}
 
 
 def filter_data(json_data: dict) -> pd.DataFrame:
@@ -38,20 +38,34 @@ def filter_data(json_data: dict) -> pd.DataFrame:
             # Creates list of dictionaries of all relevant data from JSON
             records.append({
                 # Gets date in YYYY-MM-DD
-                "date": record['date'].split("T")[0],
-                "latitude": latitude,
-                "longitude": longitude,
-                "planetary_body": name,
-                "constellation": record['position']['constellation']['name'],
-                "right_ascension_hours": record['position']['equatorial']['rightAscension']['hours'],
-                "right_ascension_string": record['position']['equatorial']['rightAscension']['string'],
-                "declination_degrees": record['position']['equatorial']['declination']['degrees'],
-                "declination_string": record['position']['equatorial']['declination']['string'],
-                "distance_km": record['distance']['fromEarth']['km'],
-                "altitude_degrees": record['position']['horizontal']['altitude']['degrees'],
-                "altitude_string": record['position']['horizontal']['altitude']['string'],
-                "azimuth_degrees": record['position']['horizontal']['azimuth']['degrees'],
-                "azimuth_string": record['position']['horizontal']['azimuth']['string']
+                "date":
+                    record['date'].split("T")[0],
+                "latitude":
+                    latitude,
+                "longitude":
+                    longitude,
+                "planetary_body":
+                    name,
+                "constellation":
+                    record['position']['constellation']['name'],
+                "right_ascension_hours":
+                    record['position']['equatorial']['rightAscension']['hours'],
+                "right_ascension_string":
+                    record['position']['equatorial']['rightAscension']['string'],
+                "declination_degrees":
+                    record['position']['equatorial']['declination']['degrees'],
+                "declination_string":
+                    record['position']['equatorial']['declination']['string'],
+                "distance_km":
+                    record['distance']['fromEarth']['km'],
+                "altitude_degrees":
+                    record['position']['horizontal']['altitude']['degrees'],
+                "altitude_string":
+                    record['position']['horizontal']['altitude']['string'],
+                "azimuth_degrees":
+                    record['position']['horizontal']['azimuth']['degrees'],
+                "azimuth_string":
+                    record['position']['horizontal']['azimuth']['string']
             })
 
     return pd.DataFrame(records)
@@ -59,5 +73,9 @@ def filter_data(json_data: dict) -> pd.DataFrame:
 
 if __name__ == "__main__":
     data = get_json_data(FILE_PATH)
-    if data:
+
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected to receive a dict, got {type(data)}")
+    if len(data) > 0:
         transformed_data = filter_data(data)
+        print(transformed_data)
