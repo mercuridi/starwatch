@@ -110,11 +110,11 @@ def get_positions_url(
     """Constructs the API endpoint for the planetary positions data"""
     planetary_positions_url: str = (
         "https://api.astronomyapi.com/api/v2/bodies/positions"
-        + f"?latitude={coordinates["lat"]}"
-        + f"&longitude={coordinates["lon"]}"
+        + f"?latitude={coordinates['lat']}"
+        + f"&longitude={coordinates['lon']}"
         + "&elevation=0"
-        + f"&from_date={dates["start"]}"
-        + f"&to_date={dates["end"]}"
+        + f"&from_date={dates['start']}"
+        + f"&to_date={dates['end']}"
         + f"&time={time}"
     )
     return planetary_positions_url
