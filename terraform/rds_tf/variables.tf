@@ -4,7 +4,7 @@ variable "aws_region" {
 }
 
 variable "public_subnet_ids" {
-  description = "The private subnets to use"
+  description = "The public subnets to use"
   type = list(string)
 }
 
