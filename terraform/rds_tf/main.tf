@@ -20,7 +20,7 @@ resource "aws_security_group" "c18-starwatch-security-group" {
     from_port   = var.db_port
     to_port     = var.db_port
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -42,7 +42,7 @@ resource "aws_db_instance" "c18-starwatch-rds" {
   port               = var.db_port
   vpc_security_group_ids = [aws_security_group.c18-starwatch-security-group.id]
   db_subnet_group_name   = aws_db_subnet_group.c18-starwatch-public-subnet-group.name
-  publicly_accessible    = false
+  publicly_accessible    = true
   skip_final_snapshot    = true
 
   tags = {
