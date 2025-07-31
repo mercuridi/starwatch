@@ -10,16 +10,18 @@ from src.extract_weather import get_client, get_response, process_current_data, 
 from src.transform_weather import transform_current_data, transform_hourly_data, transform_daily_data
 
 
-def display_current_weather_metrics(current_data: tuple[str]) -> None:
+def display_current_weather_metrics(current_data: tuple[str], daily_data: pd.DataFrame) -> None:
     temperature       = current_data[0]
     cloud_cover       = current_data[5]
     relative_humidity = current_data[1]
     precipitation     = current_data[4]
     wind_speed        = current_data[2]
     wind_gusts        = current_data[3]
+    sunrise           = str(daily_data["Sunrise"][0]) + "am"
+    sunset            = str(daily_data["Sunset"][0]) + "pm"
 
-    a, b, c = st.columns(3)
-    d, e, f = st.columns(3)
+    a, b, c, d = st.columns(4)
+    e, f, g, h = st.columns(4)
 
     a.metric("Temperature", temperature, border=True)
     b.metric("Cloud Cover", cloud_cover, border=True)
@@ -27,28 +29,60 @@ def display_current_weather_metrics(current_data: tuple[str]) -> None:
     d.metric("Precipitation", precipitation, border=True)
     e.metric("Wind Speed", wind_speed, border=True)
     f.metric("Wind Gusts", wind_gusts, border=True)
+    g.metric("Sunrise", sunrise, border=True)
+    h.metric("Sunset", sunset, border=True)
 
-def display_hourly_graphs(hourly_data:pd.DataFrame) -> None:
+
+def display_hourly_graphs(hourly_data: pd.DataFrame) -> None:
     option = st.selectbox("Select an option:", ["Temperature", "Cloud Cover",
                                                 "Relative Humidity", "Visibility",
                                                 "Wind Speed", "Wind Gusts"])
     if option == "Temperature":
-        st.line_chart(hourly_data, x="Date", y="Temperature (°C)")
+        st.line_chart(hourly_data, x="Date", y="Temperature (°C)", x_label="Time")
     if option == "Relative Humidity":
-        st.line_chart(hourly_data, x="Date", y="Relative Humidity (%)")
+        st.line_chart(hourly_data, x="Date",
+                      y="Relative Humidity (%)", x_label="Time")
     if option == "Wind Speed":
-        st.line_chart(hourly_data, x="Date", y="Wind Speed (km/h)")
+        st.line_chart(hourly_data, x="Date",
+                      y="Wind Speed (km/h)", x_label="Time")
     if option == "Wind Gusts":
-        st.line_chart(hourly_data, x="Date", y="Wind Gusts (km/h)")
+        st.line_chart(hourly_data, x="Date",
+                      y="Wind Gusts (km/h)", x_label="Time")
     if option == "Visibility":
-        st.line_chart(hourly_data, x="Date", y="Visibility (km)")
+        st.line_chart(hourly_data, x="Date",
+                      y="Visibility (km)", x_label="Time")
     if option == "Cloud Cover":
-        st.line_chart(hourly_data, x="Date", y="Cloud Cover (%)")
+        st.line_chart(hourly_data, x="Date",
+                      y="Cloud Cover (%)", x_label="Time")
 
 
+def display_daily_graphs(daily_data: pd.DataFrame) -> None:
+    option = st.selectbox("Select an option:", ["Maximum Wind Speed", "Maximum Wind Gust",
+                                                "Maximum Temperature", "Minimum Temperature",
+                                                "Sunrise", "Sunset"])
+    if option == "Maximum Wind Speed":
+        st.line_chart(daily_data, x="Date",
+                      y="Maximum Wind Speed (km/h)")
+    if option == "Maximum Wind Gust":
+        st.line_chart(daily_data, x="Date",
+                      y="Maximum Wind Gusts (km/h)")
+    if option == "Maximum Temperature":
+        st.line_chart(daily_data, x="Date",
+                      y="Maximum Temperature (°C)")
+    if option == "Minimum Temperature":
+        st.line_chart(daily_data, x="Date",
+                      y="Minimum Temperature (°C)")
+    if option == "Sunrise":
+        st.scatter_chart(daily_data, x="Date",
+                      y="Sunrise")
+    if option == "Sunset":
+        st.scatter_chart(daily_data, x="Date",
+                         y="Sunset")
 
 if __name__ == "__main__":
-    st.title("StarWatch")
+    st.title(":sparkles: StarWatch :sparkles:")
+    st.header(
+        ":crescent_moon: :night_with_stars: :milky_way: :stars: :waxing_crescent_moon: :first_quarter_moon: :waxing_gibbous_moon:")
 
     # cache weather data for 15 minutes
     weather_client = get_client(cache_expiry=900)
@@ -65,8 +99,12 @@ if __name__ == "__main__":
     transform_hourly_weather  = transform_hourly_data(extract_hourly_weather)
     transform_daily_weather   = transform_daily_data(extract_daily_weather)
 
-    st.subheader("Current Weather Stats", divider=True)
-    display_current_weather_metrics(transform_current_weather)
+    st.subheader("Current Weather Stats", divider="blue")
+    display_current_weather_metrics(transform_current_weather, transform_daily_weather)
 
-    st.subheader("24 Hour Weather Forecast", divider=True)
+    st.subheader("24 Hour Weather Forecast", divider="blue")
     display_hourly_graphs(transform_hourly_weather)
+
+    st.subheader("Weekly Weather Forecast", divider="blue")
+    display_daily_graphs(transform_daily_weather)
+
