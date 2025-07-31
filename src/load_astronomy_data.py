@@ -5,12 +5,12 @@ Transforms data into 2 dataframes, one for each table insertion in RDS
 Loads these tables into forecast and distance tables in RDS
 '''
 import os
+
 from sqlalchemy import create_engine, text, Engine
 import pandas as pd
 from dotenv import load_dotenv
-from transform_astronomy_data import get_json_data, filter_data
 
-load_dotenv()
+from transform_astronomy_data import get_json_data, filter_data
 
 FILE_PATH = "../data/planetary_data.json"
 
@@ -90,6 +90,8 @@ def make_forecast_dataframe(data: pd.DataFrame) -> pd.DataFrame:
     '''Create forecast table dataframe for database insertion and returns'''
     df = data.copy()
 
+    # Creates a new df that has all columns relevant to 'forecast' table in RDS
+    # & in the correct order for insert
     forecast_dataframe = df[
         [
             'date',
@@ -170,4 +172,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     main()
