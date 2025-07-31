@@ -21,8 +21,9 @@ CREATE TABLE planetary_body (
 -- Distance table
 CREATE TABLE distance (
     distance_id INT GENERATED ALWAYS AS IDENTITY NOT NULL,
-    kilometres FLOAT NOT NULL,
+    astronomical_units FLOAT NOT NULL,
     planetary_body_id INT NOT NULL,
+    date TIMESTAMP NOT NULL,
     PRIMARY KEY (distance_id),
     FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id)
 );
