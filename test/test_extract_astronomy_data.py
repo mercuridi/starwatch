@@ -11,7 +11,7 @@ from src.extract_astronomy_data import dump_json_data, make_dump_path, get_posit
 
 
 @pytest.fixture
-def mock_conn_with_tables():
+def mock_conn_with_data():
     mock_cursor = MagicMock()
     mock_cursor.fetchone.return_value = [1]
     mock_conn = MagicMock()
@@ -27,22 +27,32 @@ def mock_conn_empty():
     mock_conn.cursor.return_value = mock_cursor
     return mock_conn
 
-
-def test_get_date_range_with_tables(mock_conn_with_tables):
-    date_range = get_date_range(mock_conn_with_tables)
-    today = datetime.now().date()
-    expected_start = today + timedelta(days=6)
+@patch('src.extract_astronomy_data.datetime')
+def test_get_date_range_with_data(mock_datetime, mock_conn_with_data):
+    fake_today = datetime(2024, 1, 1)
+    mock_datetime.now.return_value = fake_today
+    
+    date_range = get_date_range(mock_conn_with_data)
+    
+    expected_start = fake_today.date() + timedelta(days=6)
     expected_end = expected_start + timedelta(days=1)
+    
     assert date_range == {
         "start": expected_start,
         "end": expected_end
     }
 
-
-def test_get_date_range_no_tables(mock_conn_empty):
+@patch('src.extract_astronomy_data.datetime')
+def test_get_date_range_empty(mock_datetime, mock_conn_empty):
+    fake_today = datetime(2024, 1, 1)
+    mock_datetime.now.return_value = fake_today
+    
     date_range = get_date_range(mock_conn_empty)
-    today = datetime.now().date()
-    expected_end = today + timedelta(days=6)
+    
+    
+    expected_start = fake_today.date()
+    expected_end = expected_start + timedelta(days=6)
+    
     assert date_range == {
         "start": today,
         "end": expected_end
