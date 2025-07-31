@@ -2,9 +2,6 @@
 
 import pandas as pd
 
-from extract_weather import (get_client, get_response, process_current_data,
-                             process_hourly_data, process_daily_data)
-
 
 def transform_current_data(data: tuple[float]) -> tuple[str]:
     """Rounds each measurement and returns values as tuple of strings, with correct units"""
@@ -48,9 +45,9 @@ def transform_daily_data(data: pd.DataFrame) -> pd.DataFrame:
 
     data["Date"] = data["Date"].dt.date
 
-    # Converts string to datetime then extracts time
-    data["Sunrise"] = pd.to_datetime(data["Sunrise"]).dt.time
-    data["Sunset"]  = pd.to_datetime(data["Sunset"]).dt.time
+    # Converts string to datetime then extracts time without seconds
+    data["Sunrise"] = pd.to_datetime(data["Sunrise"]).dt.strftime("%H:%M")
+    data["Sunset"] = pd.to_datetime(data["Sunset"]).dt.strftime("%H:%M")
 
     # Rounds each measurement to 1 d.p.
     data["Maximum Wind Speed (km/h)"] = data["Maximum Wind Speed (km/h)"].astype(

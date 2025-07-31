@@ -1,3 +1,4 @@
+psycopg2
 pytest
 pytest-cov
 pytest-mock
@@ -11,3 +12,4 @@ numpy
 pandas
 sqlalchemy
 psycopg2
+streamlit

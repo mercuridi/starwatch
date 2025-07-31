@@ -4,6 +4,7 @@ import base64
 import json
 from datetime import datetime, timedelta
 
+import psycopg2
 import requests
 from dotenv import load_dotenv
 
@@ -34,13 +35,53 @@ COORDINATES = {
     "lat": REGION_LATITUDE,
     "lon": REGION_LONGITUDE
 }
-DATE_TODAY = datetime.now().date()
-DATE_WEEK_FROM_NOW = DATE_TODAY + timedelta(days=6)
-DATES = {
-    "start": DATE_TODAY,
-    "end": DATE_WEEK_FROM_NOW
-}
 TIME = datetime.now().time().strftime("%H:%M:%S")
+
+
+def get_db_connection() -> psycopg2.extensions.connection:
+    """Returns a connection to the starwatch RDS database"""
+    try:
+        conn_string = f"""
+        host='{os.environ.get("db_host")}'
+        dbname='{os.environ["db_name"]}'
+        user='{os.environ["db_username"]}'
+        password='{os.environ["db_password"]}'
+        """
+        return psycopg2.connect(conn_string)
+
+    except psycopg2.OperationalError as e:
+        raise RuntimeError(f"Database connection failed: {e}") from e
+
+
+def check_db_tables(conn: psycopg2.extensions.connection) -> bool:
+    """Checks if the starwatch database has any tables"""
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT COUNT(*) 
+        FROM pg_tables 
+        WHERE schemaname = 'public';
+    """)
+    count = cursor.fetchone()[0]
+    return count > 0
+
+
+def get_date_range(conn) -> dict[str, datetime.date]:
+    """Determines the date period for which data is downloaded. 
+    7 days worth of data if the db is empty;
+    Otherwise, 1 day of data starting 7 days in advance.
+    """
+    today = datetime.now().date()
+    date_week_from_now = today + timedelta(days=6)
+
+    if check_db_tables(conn):
+        return {
+            "start": date_week_from_now,
+            "end": date_week_from_now + timedelta(days=1)
+        }
+    return {
+        "start": today,
+        "end": date_week_from_now
+    }
 
 
 def get_planetary_positions(
@@ -83,7 +124,8 @@ def handle_response(response: requests.Response, data_filepath: str) -> bool:
 def dump_json_data(response: requests.Response, json_path: str) -> None:
     """Dumps data in a context manager to ensure proper closing"""
     if not isinstance(response, requests.Response):
-        raise TypeError(f"Expected to serialise a Response object, got {type(response)}")
+        raise TypeError(
+            f"Expected to serialise a Response object, got {type(response)}")
     if not isinstance(json_path, str):
         raise TypeError("Passed json_path must be a string")
     if len(json_path) == 0:
@@ -103,10 +145,10 @@ def make_dump_path(data_filepath: str) -> str:
 
 
 def get_positions_url(
-        coordinates: dict[str:float],
-        dates: dict[str:datetime.date],
-        time: str
-    ) -> str:
+    coordinates: dict[str:float],
+    dates: dict[str:datetime.date],
+    time: str
+) -> str:
     """Constructs the API endpoint for the planetary positions data"""
     planetary_positions_url: str = (
         "https://api.astronomyapi.com/api/v2/bodies/positions"
@@ -121,6 +163,9 @@ def get_positions_url(
 
 
 if __name__ == "__main__":
+    connection = get_db_connection()
+    DATES = get_date_range(connection)
+
     get_planetary_positions(
         COORDINATES,
         DATES,
