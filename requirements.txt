@@ -9,3 +9,6 @@ requests-cache
 retry-requests
 numpy
 pandas
+boto3
+botocore
+psycopg2

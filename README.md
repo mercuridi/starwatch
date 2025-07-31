@@ -37,46 +37,48 @@ There are many things you may wish to do with the project:
 - Build the docker image: `docker buildx build . --provenance=false --platform=linux/amd64 --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
 
 ## Terraform
-This folder contains the sub-folders: `rds_tf`, `s3_tf`, and `ecr_tf`.
+This folder contains the sub-folders: `rds_tf` and `s3_tf`
 
-All sub-folders contain contains two files: `main.tf` and `variables.tf`
+### `rds_tf`
+This folder contains two files: `main.tf` and `variables.tf`
 
 #### `main.tf`
-Set ups the necessary terraform resources.
+Setups the necessary security groups, subnet group and a database instance to provision an RDS instance on AWS.
 
 #### `variables.tf`
-Defines the variables associated with each resource.
+Defines the variables needed (including the db credentials) to provision the RDS instance.
 
 **Prerequisites:**
 
-A `terraform.tfvars` file must be created within each folder. The variables to define
-for each resource are listed below.
+`terraform.tfvars` file containing:
 
-`rds_tf`:
 ```
-aws_region         = your_aws_region
+aws_region        = your_aws_region
 
 private_subnet_ids = [your_list_of_public_subnet_ids]
 
-db_identifier  = your_sql_server_host
+db_identifier      = your_sql_server_host
 db_name        = your_database_name
 db_username    = your_database_username
 db_password    = your_database_password
 
 ```
+### `s3_tf`
+This folder contains two files: `main.tf` and `variables.tf`
 
-`s3_tf`:
+#### `main.tf`
+Contains the config to setup an S3 bucket with public access blocked on AWS.
+
+#### `variables.tf`
+Defines the variables needed to provision the S3 bucket.
+
+**Prerequisites:**
+
+`terraform.tfvars` file containing:
+
 ```
 aws_region        = your_aws_region
 
-s3_bucket_name    = your_s3_bucket_name
-
-```
-
-`ecr_tf`:
-```
-aws_region  = your_aws_region
-
-ecr_name    = your_ecr_repository_name
+s3_bucket_name       = your_s3_bucket_name
 
 ```
