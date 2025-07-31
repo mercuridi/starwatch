@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 import requests
 import pytest
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock, Mock, patch
 
 from src.extract_astronomy_data import dump_json_data, make_dump_path, get_positions_url, get_planetary_positions, check_db_tables, get_date_range
 
