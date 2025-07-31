@@ -20,4 +20,4 @@ COPY src/transform_weather.py src
 COPY dashboard/dashboard.py dashboard
 
 # Run dashboard
-RUN python3 dashboard.py
+RUN streamlit run dashboard/dashboard.py
