@@ -1,4 +1,4 @@
--- Drop tables in dependency-safe order
+-- Drop tables
 DROP TABLE IF EXISTS constellation CASCADE;
 DROP TABLE IF EXISTS planetary_body CASCADE;
 DROP TABLE IF EXISTS distance CASCADE;
