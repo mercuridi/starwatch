@@ -32,14 +32,14 @@ def main():
     df = pd.DataFrame(cur.fetchall())
     cur.close()
     conn.close()
-    json_data = df.to_json(TEMP_FILE_PATH, indent=2)
+    df.to_json(TEMP_FILE_PATH, indent=2)
 
     today_date = datetime.date.today()
     s3_path = f"{today_date.year}/{today_date.month}/summary-{today_date.year}-{today_date.month}-{today_date.day}.json"
 
     s3_client = boto3.client("s3")
     try:
-        response = s3_client.upload_file(TEMP_FILE_PATH, "c18-starwatch-s3", s3_path)
+        s3_client.upload_file(TEMP_FILE_PATH, "c18-starwatch-s3", s3_path)
     except ClientError as e:
         print(e)
 
