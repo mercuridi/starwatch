@@ -48,7 +48,7 @@ resource "aws_lambda_function" "image_lambda" {
   package_type  = "Image"
 
   # change below as required
-  image_uri     = "placeholder"
+  image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c18-starwatch-ecr:astronomy_pipeline"
   timeout       = 120
   memory_size   = 512
 
