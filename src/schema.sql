@@ -1,8 +1,8 @@
--- Drop tables in dependency-safe order
-DROP TABLE IF EXISTS constellation;
-DROP TABLE IF EXISTS planetary_body;
-DROP TABLE IF EXISTS distance;
-DROP TABLE IF EXISTS forecast;
+-- Drop tables
+DROP TABLE IF EXISTS constellation CASCADE;
+DROP TABLE IF EXISTS planetary_body CASCADE;
+DROP TABLE IF EXISTS distance CASCADE;
+DROP TABLE IF EXISTS forecast CASCADE;
 
 -- Constellation table
 CREATE TABLE constellation (
