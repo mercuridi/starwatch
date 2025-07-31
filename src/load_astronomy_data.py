@@ -48,7 +48,7 @@ def get_ids_from_database(engine: Engine) -> tuple[dict, dict]:
 
     # Creates a dictionary to allow mapping to corresponding ids for schema compatibility
     planetary_body_dict = {name: id for id, name in planetary_body}
-    constellation_dict = {name: id for id, name in constellations}
+    constellation_dict  = {name: id for id, name in constellations}
     return planetary_body_dict, constellation_dict
 
 
