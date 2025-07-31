@@ -166,9 +166,8 @@ def main() -> None:
         transformed_data)
 
     distance_df = make_distance_dataframe(transformed_data)
-    print(distance_df)
 
-    # upload_to_db(forecast_df, distance_df, engine)
+    upload_to_db(forecast_df, distance_df, engine)
 
 
 if __name__ == "__main__":
