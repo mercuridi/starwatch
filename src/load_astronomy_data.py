@@ -23,6 +23,7 @@ def get_db_connection() -> Engine:
     db_port = os.getenv("db_port")
     db_host = os.getenv("db_host")
 
+    # String concatenation for connection url
     url = (
         f"postgresql+psycopg2://{db_username}:{db_password}"
         + f"@{db_host}:{db_port}/{db_name}"
@@ -45,6 +46,7 @@ def get_ids_from_database(engine: Engine) -> tuple[dict, dict]:
             text("SELECT constellation_id, constellation_name FROM constellation")
         ).fetchall()
 
+    # Creates a dictionary to allow mapping to corresponding ids for schema compatibility
     planetary_body_dict = {name: id for id, name in planetary_body}
     constellation_dict = {name: id for id, name in constellations}
     return planetary_body_dict, constellation_dict
@@ -60,6 +62,7 @@ def add_ids_to_dataframe(
     Maps id to its relevant values
     '''
 
+    # Creates id col for constellation & planetary_body, maps ids from values
     data['constellation_id'] = data['constellation'].map(
         constellation_mappings)
     data['planetary_body_id'] = data['planetary_body'].map(
@@ -69,6 +72,7 @@ def add_ids_to_dataframe(
 
 def convert_types(data: pd.DataFrame) -> pd.DataFrame:
     '''Convert data types for schema compatiblity'''
+
     for col in data.columns:
         if col.endswith('_string'):
             data[col] = data[col].astype('string')
