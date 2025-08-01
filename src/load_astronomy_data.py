@@ -118,10 +118,11 @@ def make_distance_dataframe(data: pd.DataFrame) -> pd.DataFrame:
 
     df = data.copy()
     df = df[
-        ['astronomical_units',
-         'planetary_body_id',
-         'date'
-         ]
+        [
+            'astronomical_units',
+            'planetary_body_id',
+            'date'
+        ]
     ]
 
     df['astronomical_units'] = df['astronomical_units'].astype(
@@ -145,31 +146,29 @@ def upload_to_db(forecast_df: pd.DataFrame, distance_df: pd.DataFrame, engine: E
     )
 
 
-def main() -> None:
+def main(data: pd.DataFrame) -> None:
     '''Bundles all functions together for one function call'''
-    engine = get_db_connection()
-    transformed_data = get_transformed_data()
+    load_dotenv()
 
-    if transformed_data.empty:
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError(f"Expected a pd.DataFrame, got {type(data)}")
+
+    if data.empty:
         raise ValueError("No Data Available")
 
+    engine = get_db_connection()
     planetary_body_dict, constellation_dict = get_ids_from_database(engine)
 
-    transformed_data = add_ids_to_dataframe(
-        transformed_data,
+    data = add_ids_to_dataframe(
+        data,
         planetary_body_dict,
         constellation_dict
     )
-    transformed_data = convert_types(transformed_data)
+    data = convert_types(data)
 
-    forecast_df = make_forecast_dataframe(
-        transformed_data)
+    forecast_df = make_forecast_dataframe(data)
 
-    distance_df = make_distance_dataframe(transformed_data)
+    distance_df = make_distance_dataframe(data)
 
     upload_to_db(forecast_df, distance_df, engine)
-
-
-if __name__ == "__main__":
-    load_dotenv()
-    main()
+    return True
