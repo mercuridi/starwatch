@@ -2,8 +2,6 @@
 
 import pandas as pd
 
-from extract_weather import get_client, get_response, process_current_data, process_daily_data, process_hourly_data
-
 
 def transform_current_data(data: tuple[float]) -> tuple[str]:
     """Rounds each measurement and returns values as tuple of strings, with correct units"""
