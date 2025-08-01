@@ -1,12 +1,13 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
 import os
-import base64
 import json
 from datetime import datetime, timedelta
 
 import psycopg2
 import requests
 from dotenv import load_dotenv
+
+from astronomy_utils import make_request_headers
 
 load_dotenv()
 # ^ This needs removing from the global namespace before containerisation!!!
@@ -16,17 +17,6 @@ load_dotenv()
 
 # Folder path for the json output
 DATA_FILEPATH = '../data/'
-
-# Authentication method for Astronomy API
-USER_PASS = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
-AUTH_STRING = base64.b64encode(USER_PASS.encode()).decode()
-
-# Set up headers for API request
-HEADERS = {
-    'Authorization': f'Basic {AUTH_STRING}',
-    'Content-Type': 'application/json'
-}
-
 
 # Global variables
 REGION_LATITUDE = +40.7128
@@ -173,3 +163,4 @@ if __name__ == "__main__":
         HEADERS,
         DATA_FILEPATH
     )
+    
