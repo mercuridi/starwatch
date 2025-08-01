@@ -9,11 +9,16 @@ Quickly get insights to your favourite constellations and information on the bes
     - Contains github-related utilities including CI/CD instructions.
 - assets
     - Contains useful utility files for other parts of the project.
-    - eg. architecture diagrams
+- dashboard
+    - Contains the source code for *only* the user-facing dashboard.
 - data
     - Contains data dumps for project scripts.
+- docker
+    - Contains dockerfiles and deploy scripts for containerisation of the project.
 - src
     - Contains source code for the different pipelines of the project.
+- terraform
+    - Contains various terraform files for different provisioned AWS resources
 - test
     - Contains various tests for the different scripts in the project.
 - Top level
