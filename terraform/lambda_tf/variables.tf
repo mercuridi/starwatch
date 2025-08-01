@@ -43,12 +43,12 @@ variable "DB_SCHEMA" {
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "Private subnet IDs to host Lambda"
-  type        = list(string)
+variable "private_subnet_id" {
+  description = "Private subnet ID to host Lambda"
+  type        = string
 }
 
-variable "public_subnet_ids" {
-  description = "Public subnet IDs for NAT Gateway"
-  type        = list(string)
+variable "public_subnet_id" {
+  description = "Public subnet ID for NAT Gateway"
+  type        = string
 }
