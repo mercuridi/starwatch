@@ -163,8 +163,7 @@ def main(data: pd.DataFrame) -> None:
     )
     data = convert_types(data)
 
-    forecast_df = make_forecast_dataframe(
-        data)
+    forecast_df = make_forecast_dataframe(data)
 
     distance_df = make_distance_dataframe(data)
 
