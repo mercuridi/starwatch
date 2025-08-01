@@ -53,16 +53,21 @@ def get_db_connection() -> psycopg2.extensions.connection:
         raise RuntimeError(f"Database connection failed: {e}") from e
 
 
-def check_db_tables(conn: psycopg2.extensions.connection) -> bool:
-    """Checks if the starwatch database has any tables"""
+def check_data_in_tables(conn: psycopg2.extensions.connection) -> bool:
+    """Checks if the forecast and distance tables in the database have any data.
+    Returns True if tables have data - false if tables are empty"""
     cursor = conn.cursor()
     cursor.execute("""
         SELECT COUNT(*) 
-        FROM pg_tables 
-        WHERE schemaname = 'public';
+        FROM forecast;
     """)
-    count = cursor.fetchone()[0]
-    return count > 0
+    forecast_count = cursor.fetchone()[0]
+    cursor.execute("""
+        SELECT COUNT(*) 
+        FROM distance;
+    """)
+    distance_count = cursor.fetchone()[0]
+    return forecast_count > 0 and distance_count > 0
 
 
 def get_date_range(conn) -> dict[str, datetime.date]:
@@ -73,7 +78,7 @@ def get_date_range(conn) -> dict[str, datetime.date]:
     today = datetime.now().date()
     date_week_from_now = today + timedelta(days=6)
 
-    if check_db_tables(conn):
+    if check_data_in_tables(conn):
         return {
             "start": date_week_from_now,
             "end": date_week_from_now + timedelta(days=1)
