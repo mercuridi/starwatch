@@ -34,7 +34,9 @@ There are many things you may wish to do with the project:
 - Run pytest: `python3 -m pytest test/`
 - Run pytest coverage checks: `python3 -m pytest --cov=src --cov-report term-missing test/`
 - Run pylint: `python3 -m pylint *.py`
-- Build the docker image: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
+- Build the docker image for the astronomy pipeline: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
+- Build the docker image for the dashboard: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/dashboard.Dockerfile`
+- Directly deploy the astronomy pipeline to AWS (build and push): `docker/deploy_astronomy.sh`
 
 ## Terraform
 This folder contains the sub-folders: `rds_tf`, `s3_tf`, and `ecr_tf`.
