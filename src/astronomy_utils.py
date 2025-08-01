@@ -7,19 +7,19 @@ DATA_FILEPATH = '../data/'
 def construct_astronomy_api_auth():
     """
     WARN!!! Assumes the .env is loaded and has values for:
-        - applicationId
-        - applicationSecret
+        - APPLICATION_ID
+        - APPLICATION_SECRET
     Constructs & returns an authorisation string for the Astronomy API
     """
-    user_pass = f"{os.getenv('applicationId')}:{os.getenv('applicationSecret')}"
+    user_pass = f"{os.getenv('APPLICATION_ID')}:{os.getenv('APPLICATION_SECRET')}"
     auth_string = base64.b64encode(user_pass.encode()).decode()
     return auth_string
 
 def make_request_headers():
     """
     WARN!!! Assumes the .env is loaded and has values for:
-        - applicationId
-        - applicationSecret
+        - APPLICATION_ID
+        - APPLICATION_SECRET
     Makes and returns the headers for the Astronomy API request
     """
     headers = {

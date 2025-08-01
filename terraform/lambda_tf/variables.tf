@@ -18,6 +18,16 @@ variable "vpc_id" {
     type = string
 }
 
+variable "private_subnet_id" {
+  description = "Private subnet ID to host Lambda"
+  type        = string
+}
+
+variable "public_subnet_id" {
+  description = "Public subnet ID for NAT Gateway"
+  type        = string
+}
+
 variable "DB_HOST" {
   description = "IP to access the RDS"
   type        = string
@@ -43,12 +53,12 @@ variable "DB_SCHEMA" {
   type        = string
 }
 
-variable "private_subnet_id" {
-  description = "Private subnet ID to host Lambda"
-  type        = string
+variable "APPLICATION_ID" {
+    description = "Application ID secret for Astronomy API"
+    type = string
 }
 
-variable "public_subnet_id" {
-  description = "Public subnet ID for NAT Gateway"
-  type        = string
+variable "APPLICATION_SECRET" {
+    description = "Application Secret secret for Astronomy API"
+    type = string
 }

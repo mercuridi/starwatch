@@ -62,6 +62,8 @@ resource "aws_lambda_function" "image_lambda" {
       DB_PASSWORD = var.DB_PASSWORD
       DB_NAME     = var.DB_NAME
       DB_SCHEMA   = var.DB_SCHEMA
+      APPLICATION_ID = var.APPLICATION_ID
+      APPLICATION_SECRET = var.APPLICATION_SECRET
     }
   }
   vpc_config {
