@@ -148,9 +148,11 @@ def upload_to_db(forecast_df: pd.DataFrame, distance_df: pd.DataFrame, engine: E
 
 def main(data: pd.DataFrame) -> None:
     '''Bundles all functions together for one function call'''
+    load_dotenv()
+
     if not isinstance(data, pd.DataFrame):
         raise TypeError(f"Expected a pd.DataFrame, got {type(data)}")
-    
+
     if data.empty:
         raise ValueError("No Data Available")
 
