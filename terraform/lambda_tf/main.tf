@@ -56,14 +56,14 @@ resource "aws_lambda_function" "image_lambda" {
 
   environment {
     variables = {
-      DB_HOST     = var.DB_HOST
-      DB_PORT     = var.DB_PORT
-      DB_USER     = var.DB_USER
-      DB_PASSWORD = var.DB_PASSWORD
-      DB_NAME     = var.DB_NAME
-      DB_SCHEMA   = var.DB_SCHEMA
-      APPLICATION_ID = var.APPLICATION_ID
-      APPLICATION_SECRET = var.APPLICATION_SECRET
+    DB_HOST               = var.DB_HOST
+      DB_PORT             = var.DB_PORT
+      DB_USER             = var.DB_USER
+      DB_PASSWORD         = var.DB_PASSWORD
+      DB_NAME             = var.DB_NAME
+      DB_SCHEMA           = var.DB_SCHEMA
+      APPLICATION_ID      = var.APPLICATION_ID
+      APPLICATION_SECRET  = var.APPLICATION_SECRET
     }
   }
   vpc_config {
