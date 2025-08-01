@@ -1,10 +1,15 @@
 """Dashboard script"""
 
 import sys
+import os
+from datetime import datetime
+
 import openmeteo_requests
 from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
 import streamlit as st
 import pandas as pd
+from sqlalchemy import create_engine, text, Engine
+from dotenv import load_dotenv
 
 
 sys.path.append('../')
@@ -13,7 +18,6 @@ from src.extract_weather import (get_client, get_response,
                                  process_daily_data)
 from src.transform_weather import (transform_current_data, transform_hourly_data,
                                    transform_daily_data)
-
 
 
 def create_regions_dataframe():
@@ -67,6 +71,7 @@ def create_regions_dataframe():
     return pd.DataFrame(data=regions)
 
 
+
 def create_response_for_region(region_name: str, regions: pd.DataFrame,
                                weather_client: openmeteo_requests.Client) -> WeatherApiResponse:
     """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing 
@@ -79,6 +84,7 @@ def create_response_for_region(region_name: str, regions: pd.DataFrame,
 
     return get_response(
         latitude=region_latitude, longitude=region_longitude, client=weather_client)
+
 
 
 def display_current_weather_metrics(current_data: tuple[str], daily_data: pd.DataFrame) -> None:
@@ -153,26 +159,22 @@ def display_daily_graphs(daily_data: pd.DataFrame) -> None:
                          y="Sunset")
 
 
-
-def main():
-    """Main function"""
-
-    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
-
-    # Cache weather data for 15 minutes
-    weather_client = get_client(cache_expiry=900)
+def weather_section() -> None:
+    """Weather section of the dashboard, with selectable region"""""
 
     st.subheader("Region Selection :world_map:", divider="blue")
     regions_df = create_regions_dataframe()
-    option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
-                                               "East of England", "London",
-                                               "North East & Cumbria", "North West",
-                                               "Northern Ireland", "Scotland",
-                                               "South East", "South West",
-                                               "West Midlands", "Yorkshire & the Humber"])
+    region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
+                                                      "East of England", "London",
+                                                      "North East & Cumbria", "North West",
+                                                      "Northern Ireland", "Scotland",
+                                                      "South East", "South West",
+                                                      "West Midlands", "Yorkshire & the Humber"])
 
+    # Cache weather data for 15 minutes
+    weather_client = get_client(cache_expiry=900)
     weather_response = create_response_for_region(
-        option, regions_df, weather_client)
+        region_option, regions_df, weather_client)
 
     # Extract and transform data
     extract_current_weather = process_current_data(weather_response)
@@ -193,12 +195,135 @@ def main():
     st.subheader("Weekly Weather Forecast", divider="blue")
     display_daily_graphs(transform_daily_weather)
 
-    st.header(
-        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
-        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: :new_moon:")
 
-    st.header(":stars:")
+
+def get_db_connection() -> Engine:
+    """Establish and returns connection to DB"""
+    load_dotenv()
+    db_username = os.getenv("db_username")
+    db_password = os.getenv("db_password")
+    db_name = os.getenv("db_name")
+    db_port = os.getenv("db_port")
+    db_host = os.getenv("db_host")
+
+    # String concatenation for connection url
+    url = (
+        f"postgresql+psycopg2://{db_username}:{db_password}"
+        + f"@{db_host}:{db_port}/{db_name}"
+    )
+    return create_engine(url)
+
+
+def get_rds_data(engine: Engine, table_name: str):
+    """Connects to RDS database and returns data corresponding to the table name
+    entered.
+    """
+    with engine.connect() as conn:
+        rds_data = conn.execute(
+            text(f"SELECT * FROM {table_name}")).fetchall()
+    return rds_data
+
+
+
+def get_all_data(engine: Engine) -> pd.DataFrame:
+    """Returns all relevant data from the database to be displayed in the dashboard"""
+
+    # Query database to select all data from each table
+    distance_df = pd.DataFrame(get_rds_data(engine, "distance"))
+    planetary_body_df = pd.DataFrame(get_rds_data(engine, "planetary_body"))
+    forecast_df = pd.DataFrame(get_rds_data(engine, "forecast"))
+    constellation_df = pd.DataFrame(get_rds_data(engine, "constellation"))
+
+    # Merge table
+    distance_pb = pd.merge(
+        distance_df, planetary_body_df, on="planetary_body_id")
+    distance_pb_forecast = pd.merge(
+        distance_pb, forecast_df, on=["planetary_body_id", "date"])
+    all_data = pd.merge(distance_pb_forecast,
+                        constellation_df, on="constellation_id")
+
+    return all_data[["planetary_body_name", "date", "constellation_name",
+                     "astronomical_units", "right_ascension_hours", "right_ascension_string",
+                     "declination_degrees", "declination_string", "altitude_degrees",
+                     "altitude_string", "azimuth_degrees", "azimuth_string"]]
+
+
+
+def select_planetary_body_metrics(data: pd.DataFrame) -> None:
+    """Displays metrics for a selectable planetary body"""
+
+    st.subheader("Planetary Positions :telescope:", divider="blue")
+    planetary_body_option = st.selectbox("Select a planetary body:", ["Sun", "Moon",
+                                                                      "Mercury", "Venus",
+                                                                      "Earth", "Mars",
+                                                                      "Jupiter", "Saturn",
+                                                                      "Uranus", "Neptune",
+                                                                      "Pluto"])
+
+    pb_data = data[data["planetary_body_name"] == planetary_body_option]
+    
+    pb_data_specific_date = pb_data[pb_data["date"] == "2025-08-07"]
+    # change date to today once db is updated
+    today = datetime.today().strftime("%Y-%m-%d")
+    # pb_data_today = = pb_data[pb_data["date"] == today]
+
+    a, b = st.columns(2)
+
+    a.metric("Distance from Earth",
+             str(pb_data_specific_date["astronomical_units"].iloc[0]) + " AU", border=True)
+    b.metric("Constellation",
+             pb_data_specific_date["constellation_name"].iloc[0], border=True)
+
+
+    equatorial = pb_data[["date", "right_ascension_string", "declination_string"]]
+    equatorial.rename(
+        columns={"right_ascension_string": "Right Ascension", "declination_string": "Declination"}, inplace=True)
+
+    equatorial["date"] = equatorial["date"].dt.strftime("%Y-%m-%d")
+    transpose_equatorial = equatorial.transpose()
+
+    header = transpose_equatorial.iloc[0]
+    transpose_equatorial = transpose_equatorial[1:]
+    transpose_equatorial.columns = header
+    st.markdown("##### Equatorial co-ordinates:")
+    st.table(transpose_equatorial)
+
+    horizontal = pb_data[["date", "altitude_string", "azimuth_string"]]
+    horizontal.rename(
+        columns={"altitude_string": "Altitude", "azimuth_string": "Azimuth"}, inplace=True)
+
+    horizontal["date"] = horizontal["date"].dt.strftime("%Y-%m-%d")
+    transpose_horizontal = horizontal.transpose()
+
+    header = transpose_horizontal.iloc[0]
+    transpose_horizontal = transpose_horizontal[1:]
+    transpose_horizontal.columns = header
+
+    st.markdown("##### Horizontal co-ordinates:")
+    st.table(transpose_horizontal)
+
+
+
+def main():
+    """Main function"""
+
+    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
+
+    engine = get_db_connection()
+    planetary_data = get_all_data(engine)
+    select_planetary_body_metrics(planetary_data)
+
+    st.header(
+        ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
+        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: "
+        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: " \
+        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
+
+    weather_section()
+
 
 
 if __name__ == "__main__":
     main()
+    # engine = get_db_connection()
+    # all_data = get_all_data(engine)
