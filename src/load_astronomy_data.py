@@ -118,15 +118,14 @@ def make_distance_dataframe(data: pd.DataFrame) -> pd.DataFrame:
 
     df = data.copy()
     df = df[
-        ['distance_km',
-         'planetary_body_id'
+        ['astronomical_units',
+         'planetary_body_id',
+         'date'
          ]
     ]
 
-    df['distance_km'] = df['distance_km'].astype(
+    df['astronomical_units'] = df['astronomical_units'].astype(
         float)
-    df = df.rename(
-        columns={'distance_km': 'kilometres'})
     return df
 
 
