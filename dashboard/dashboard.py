@@ -274,33 +274,40 @@ def select_planetary_body_metrics(data: pd.DataFrame) -> None:
     b.metric("Constellation",
              pb_data_specific_date["constellation_name"].iloc[0], border=True)
 
+    col1, col2 = st.columns(2)
+    with col1:
+        equatorial_button = st.button("Equatorial")
+    with col2:
+        horizontal_button = st.button("Horizontal")
 
-    equatorial = pb_data[["date", "right_ascension_string", "declination_string"]]
-    equatorial.rename(
-        columns={"right_ascension_string": "Right Ascension", "declination_string": "Declination"}, inplace=True)
+    if equatorial_button:
+        equatorial = pb_data[["date", "right_ascension_string", "declination_string"]]
+        equatorial.rename(
+            columns={"right_ascension_string": "Right Ascension", "declination_string": "Declination"}, inplace=True)
 
-    equatorial["date"] = equatorial["date"].dt.strftime("%Y-%m-%d")
-    transpose_equatorial = equatorial.transpose()
+        equatorial["date"] = equatorial["date"].dt.strftime("%Y-%m-%d")
+        transpose_equatorial = equatorial.transpose()
 
-    header = transpose_equatorial.iloc[0]
-    transpose_equatorial = transpose_equatorial[1:]
-    transpose_equatorial.columns = header
-    st.markdown("##### Equatorial co-ordinates:")
-    st.table(transpose_equatorial)
+        header = transpose_equatorial.iloc[0]
+        transpose_equatorial = transpose_equatorial[1:]
+        transpose_equatorial.columns = header
+        st.markdown("##### Equatorial co-ordinates:")
+        st.table(transpose_equatorial)
 
-    horizontal = pb_data[["date", "altitude_string", "azimuth_string"]]
-    horizontal.rename(
-        columns={"altitude_string": "Altitude", "azimuth_string": "Azimuth"}, inplace=True)
+    if horizontal_button:
+        horizontal = pb_data[["date", "altitude_string", "azimuth_string"]]
+        horizontal.rename(
+            columns={"altitude_string": "Altitude", "azimuth_string": "Azimuth"}, inplace=True)
 
-    horizontal["date"] = horizontal["date"].dt.strftime("%Y-%m-%d")
-    transpose_horizontal = horizontal.transpose()
+        horizontal["date"] = horizontal["date"].dt.strftime("%Y-%m-%d")
+        transpose_horizontal = horizontal.transpose()
 
-    header = transpose_horizontal.iloc[0]
-    transpose_horizontal = transpose_horizontal[1:]
-    transpose_horizontal.columns = header
+        header = transpose_horizontal.iloc[0]
+        transpose_horizontal = transpose_horizontal[1:]
+        transpose_horizontal.columns = header
 
-    st.markdown("##### Horizontal co-ordinates:")
-    st.table(transpose_horizontal)
+        st.markdown("##### Horizontal co-ordinates:")
+        st.table(transpose_horizontal)
 
 
 
