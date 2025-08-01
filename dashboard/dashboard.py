@@ -1,8 +1,7 @@
 """Dashboard script"""
 
-import sys
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import openmeteo_requests
 from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
@@ -12,7 +11,6 @@ from sqlalchemy import create_engine, text, Engine
 from dotenv import load_dotenv
 
 
-sys.path.append('../')
 from src.extract_weather import (get_client, get_response,
                                  process_current_data, process_hourly_data,
                                  process_daily_data)
@@ -249,8 +247,48 @@ def get_all_data(engine: Engine) -> pd.DataFrame:
 
 
 
-def select_planetary_body_metrics(data: pd.DataFrame) -> None:
-    """Displays metrics for a selectable planetary body"""
+def format_coordinate_data(planetary_body_data: pd.DataFrame, coordinate_type: str) -> pd.DataFrame:
+    """Transforms dataframe in an ideal format to display on the dashboard"""
+
+    # Extract relevant information and rename columns for equatorial data
+    if coordinate_type == "equatorial":
+        relevant_data = planetary_body_data[[
+            "date", "right_ascension_string", "declination_string"]]
+        relevant_data = relevant_data.copy()
+        relevant_data.rename(columns={"right_ascension_string": "Right Ascension",
+                                      "declination_string": "Declination"}, inplace=True)
+
+    # Extract relevant information and rename columns for horizontal data
+    elif coordinate_type == "horizontal":
+        relevant_data = planetary_body_data[[
+            "date", "altitude_string", "azimuth_string"]]
+        relevant_data = relevant_data.copy()
+        relevant_data.rename(
+            columns={"altitude_string": "Altitude", "azimuth_string": "Azimuth"}, inplace=True)
+
+    # Extract one week of data from today
+    today = pd.Timestamp("today").normalize()
+    one_week = today + timedelta(days=7)
+    one_week_data = relevant_data.loc[(relevant_data["date"] >= today) & (
+        relevant_data["date"] <= one_week)].copy()
+
+    # Convert date column to string to ensure time data not displayed on dashboard
+    one_week_data = one_week_data.copy()
+    one_week_data["date"] = one_week_data["date"].dt.strftime("%Y-%m-%d")
+
+    # Transpose data for present data in clear format
+    transpose_data = one_week_data.transpose()
+    header = transpose_data.iloc[0]
+    transpose_data = transpose_data[1:]
+    transpose_data.columns = header
+
+    return transpose_data
+
+
+def display_planetary_body_data(data: pd.DataFrame) -> None:
+    """Displays planetary body data, including two metrics and two tables,
+    with the option to select the planetary body.
+    """
 
     st.subheader("Planetary Positions :telescope:", divider="blue")
     planetary_body_option = st.selectbox("Select a planetary body:", ["Sun", "Moon",
@@ -261,18 +299,16 @@ def select_planetary_body_metrics(data: pd.DataFrame) -> None:
                                                                       "Pluto"])
 
     pb_data = data[data["planetary_body_name"] == planetary_body_option]
-    
-    pb_data_specific_date = pb_data[pb_data["date"] == "2025-08-07"]
-    # change date to today once db is updated
+
     today = datetime.today().strftime("%Y-%m-%d")
-    # pb_data_today = = pb_data[pb_data["date"] == today]
+    pb_data_today = pb_data[pb_data["date"] == today]
 
     a, b = st.columns(2)
-
     a.metric("Distance from Earth",
-             str(pb_data_specific_date["astronomical_units"].iloc[0]) + " AU", border=True)
+             str(pb_data_today["astronomical_units"].iloc[0]) + " AU", border=True)
     b.metric("Constellation",
-             pb_data_specific_date["constellation_name"].iloc[0], border=True)
+             pb_data_today["constellation_name"].iloc[0], border=True)
+
 
     col1, col2 = st.columns(2)
     with col1:
@@ -281,31 +317,12 @@ def select_planetary_body_metrics(data: pd.DataFrame) -> None:
         horizontal_button = st.button("Horizontal")
 
     if equatorial_button:
-        equatorial = pb_data[["date", "right_ascension_string", "declination_string"]]
-        equatorial.rename(
-            columns={"right_ascension_string": "Right Ascension", "declination_string": "Declination"}, inplace=True)
-
-        equatorial["date"] = equatorial["date"].dt.strftime("%Y-%m-%d")
-        transpose_equatorial = equatorial.transpose()
-
-        header = transpose_equatorial.iloc[0]
-        transpose_equatorial = transpose_equatorial[1:]
-        transpose_equatorial.columns = header
+        transpose_equatorial = format_coordinate_data(pb_data, "equatorial")
         st.markdown("##### Equatorial co-ordinates:")
         st.table(transpose_equatorial)
 
     if horizontal_button:
-        horizontal = pb_data[["date", "altitude_string", "azimuth_string"]]
-        horizontal.rename(
-            columns={"altitude_string": "Altitude", "azimuth_string": "Azimuth"}, inplace=True)
-
-        horizontal["date"] = horizontal["date"].dt.strftime("%Y-%m-%d")
-        transpose_horizontal = horizontal.transpose()
-
-        header = transpose_horizontal.iloc[0]
-        transpose_horizontal = transpose_horizontal[1:]
-        transpose_horizontal.columns = header
-
+        transpose_horizontal = format_coordinate_data(pb_data, "horizontal")
         st.markdown("##### Horizontal co-ordinates:")
         st.table(transpose_horizontal)
 
@@ -317,8 +334,8 @@ def main():
     st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
     engine = get_db_connection()
-    planetary_data = get_all_data(engine)
-    select_planetary_body_metrics(planetary_data)
+    all_planetary_data = get_all_data(engine)
+    display_planetary_body_data(all_planetary_data)
 
     st.header(
         ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
@@ -329,8 +346,5 @@ def main():
     weather_section()
 
 
-
 if __name__ == "__main__":
     main()
-    # engine = get_db_connection()
-    # all_data = get_all_data(engine)
