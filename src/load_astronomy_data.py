@@ -118,10 +118,11 @@ def make_distance_dataframe(data: pd.DataFrame) -> pd.DataFrame:
 
     df = data.copy()
     df = df[
-        ['astronomical_units',
-         'planetary_body_id',
-         'date'
-         ]
+        [
+            'astronomical_units',
+            'planetary_body_id',
+            'date'
+        ]
     ]
 
     df['astronomical_units'] = df['astronomical_units'].astype(
