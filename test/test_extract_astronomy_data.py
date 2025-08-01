@@ -68,7 +68,6 @@ def data():
         "data_filepath": '../data/',
 
         # Set up headers for API request
-
         "headers": {
             'Authorization': f'Basic' + str(base64.b64encode(f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}".encode()).decode()),
             'Content-Type': 'application/json'
