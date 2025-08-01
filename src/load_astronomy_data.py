@@ -48,7 +48,7 @@ def get_ids_from_database(engine: Engine) -> tuple[dict, dict]:
 
     # Creates a dictionary to allow mapping to corresponding ids for schema compatibility
     planetary_body_dict = {name: id for id, name in planetary_body}
-    constellation_dict  = {name: id for id, name in constellations}
+    constellation_dict = {name: id for id, name in constellations}
     return planetary_body_dict, constellation_dict
 
 
@@ -118,15 +118,14 @@ def make_distance_dataframe(data: pd.DataFrame) -> pd.DataFrame:
 
     df = data.copy()
     df = df[
-        ['distance_km',
-         'planetary_body_id'
+        ['astronomical_units',
+         'planetary_body_id',
+         'date'
          ]
     ]
 
-    df['distance_km'] = df['distance_km'].astype(
+    df['astronomical_units'] = df['astronomical_units'].astype(
         float)
-    df = df.rename(
-        columns={'distance_km': 'kilometres'})
     return df
 
 
