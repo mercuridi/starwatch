@@ -12,8 +12,8 @@ from astronomy_utils import make_request_headers
 DATA_FILEPATH = '../data/'
 
 COORDINATES = {
-    "lat": +40.7128,
-    "lon": -74.0060
+    "lat": +51.30,
+    "lon": -00.05
 }
 
 def get_db_connection() -> psycopg2.extensions.connection:
