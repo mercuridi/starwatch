@@ -57,7 +57,6 @@ def run_pipeline():
     print(f"Pipeline finished in {load_end-extract_start}")
 
 
-
 def handler(event, context):
     """handler function for lambda function"""
     try:
@@ -67,6 +66,7 @@ def handler(event, context):
         return {"statusCode": 200}
     except (TypeError, ValueError, IndexError) as e:
         return {"statusCode": 500, "error": str(e)}
+
 
 if __name__ == "__main__":
     run_pipeline()
