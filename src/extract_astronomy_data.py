@@ -160,7 +160,7 @@ if __name__ == "__main__":
         COORDINATES,
         DATES,
         str(TIME),
-        HEADERS,
+        make_request_headers(),
         DATA_FILEPATH
     )
-    
+
