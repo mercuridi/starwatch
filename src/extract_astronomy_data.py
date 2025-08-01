@@ -5,28 +5,16 @@ from datetime import datetime, timedelta
 
 import psycopg2
 import requests
-from dotenv import load_dotenv
 
 from astronomy_utils import make_request_headers
-
-load_dotenv()
-# ^ This needs removing from the global namespace before containerisation!!!
-# If you leave this in stuff will start breaking later on - remove ASAP tbh
-# Right now it has to be here because some assignments lower down *need* the
-# .env to be loaded in order to work at all, and if the assignments break nothing happens
 
 # Folder path for the json output
 DATA_FILEPATH = '../data/'
 
-# Global variables
-REGION_LATITUDE = +40.7128
-REGION_LONGITUDE = -74.0060
 COORDINATES = {
-    "lat": REGION_LATITUDE,
-    "lon": REGION_LONGITUDE
+    "lat": +40.7128,
+    "lon": -74.0060
 }
-TIME = datetime.now().time().strftime("%H:%M:%S")
-
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """Returns a connection to the starwatch RDS database"""
@@ -82,9 +70,9 @@ def get_date_range(conn) -> dict[str, datetime.date]:
 def get_planetary_positions(
     coordinates: dict[str:float],
     dates: dict[str:datetime.date],
-    time: str,
     header: dict[str:str],
-    data_filepath: str
+    data_filepath: str,
+    time: str=str(datetime.now().time().strftime("%H:%M:%S"))
 ) -> bool:
     '''
     Gets information on planetary bodies from current day
@@ -164,8 +152,6 @@ if __name__ == "__main__":
     get_planetary_positions(
         COORDINATES,
         DATES,
-        str(TIME),
         make_request_headers(),
         DATA_FILEPATH
     )
-
