@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_execution" {
 
 # Security group for Lambda
 resource "aws_security_group" "lambda_sg" {
-  name        = "c18-starwatch-lambda-sg"
+  name        = "c18-starwatch-astronomy-lambda-sg"
   description = "Allow Lambda to connect to RDS SQL Server"
   vpc_id      = var.vpc_id
 
@@ -51,6 +51,8 @@ resource "aws_lambda_function" "image_lambda" {
   image_uri     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/c18-starwatch-ecr:astronomy_pipeline"
   timeout       = 120
   memory_size   = 512
+
+  architectures = ["arm64"]
 
   environment {
     variables = {

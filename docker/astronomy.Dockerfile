@@ -1,31 +1,20 @@
-# Dockerfile for the astronomy script
-# Must be run from top-level
-
-# Default architecture value
+# Use AWS Lambda Python base image
 ARG ARCHITECTURE="arm64"
-
-# Start from lambda Python3.8 image
 FROM public.ecr.aws/lambda/python:3.8-${ARCHITECTURE}
 
-# Install postgresql-devel in your image
-RUN yum install -y gcc postgresql-devel
-
-# Move to the lambda task root directory
+# Install OS deps and Python requirements in one layer
 WORKDIR ${LAMBDA_TASK_ROOT}
+COPY requirements.txt ./
+RUN yum install -y gcc postgresql-devel \
+    && pip install -r requirements.txt \
+    && yum clean all
 
-# Copy requirements
-COPY requirements.txt .
-
-# Install requirements
-RUN pip install -r requirements.txt
-
-# Copy source code
-COPY src/extract_astronomy_data.py .
+# Copy only the files you need into src/
+COPY src/extract_astronomy_data.py   .
 COPY src/transform_astronomy_data.py .
-COPY src/load_astronomy_data.py .
-COPY src/pipeline_astronomy_data.py .
+COPY src/load_astronomy_data.py      .
+COPY src/pipeline_astronomy_data.py  .
+COPY src/astronomy_utils.py .
 
-# Expects a function called `handler` in `pipeline_astronomy_data.py`
-# Required function signature:
-# `def handler(event, context):`
+# Tell Lambda to invoke the handler inside the src package
 CMD ["pipeline_astronomy_data.handler"]

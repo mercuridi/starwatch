@@ -5,6 +5,7 @@ Transforms data into 2 dataframes, one for each table insertion in RDS
 Loads these tables into forecast and distance tables in RDS
 '''
 import os
+from typing import Tuple
 
 from sqlalchemy import create_engine, text, Engine
 import pandas as pd
@@ -17,11 +18,11 @@ FILE_PATH = "../data/planetary_data.json"
 
 def get_db_connection() -> Engine:
     '''Establish and returns connection to DB'''
-    db_username = os.getenv("db_username")
-    db_password = os.getenv("db_password")
-    db_name = os.getenv("db_name")
-    db_port = os.getenv("db_port")
-    db_host = os.getenv("db_host")
+    db_username = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_name = os.getenv("DB_NAME")
+    db_port = os.getenv("DB_PORT")
+    db_host = os.getenv("DB_HOST")
 
     # String concatenation for connection url
     url = (
@@ -37,7 +38,7 @@ def get_transformed_data() -> pd.DataFrame:
     return transformed_data
 
 
-def get_ids_from_database(engine: Engine) -> tuple[dict, dict]:
+def get_ids_from_database(engine: Engine) -> Tuple[dict, dict]:
     '''Gets planetary body id and constellation ids as a dictionary, returns for mapping'''
     with engine.connect() as conn:
         planetary_body = conn.execute(
