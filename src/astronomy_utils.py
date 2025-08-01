@@ -2,6 +2,8 @@
 import os
 import base64
 
+DATA_FILEPATH = '../data/'
+
 def construct_astronomy_api_auth():
     """
     WARN!!! Assumes the .env is loaded and has values for:

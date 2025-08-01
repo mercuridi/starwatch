@@ -1,4 +1,5 @@
 """Module to pull together the full ETL pipeline for the astronomy data"""
+from dotenv import load_dotenv
 
 import extract_astronomy_data
 import transform_astronomy_data
@@ -8,20 +9,19 @@ import astronomy_utils
 def run_pipeline():
     """Runs the astronomy pipeline from start to finish"""
     # extract
+    load_dotenv()
     connection = extract_astronomy_data.get_db_connection()
-    dates = extract_astronomy_data.get_date_range(connection)
 
-    extract_astronomy_data.get_planetary_positions(
-        COORDINATES,
-        dates,
-        str(TIME),
-        astronomy_utils.make_request_headers(),
-        DATA_FILEPATH
+    data = extract_astronomy_data.get_planetary_positions(
+        { # coordinates dict
+            "lat": +51.30,
+            "lon": -00.05
+        },
+        extract_astronomy_data.get_date_range(connection),
+        astronomy_utils.make_request_headers()
     )
 
     # transform
-    data = transform_astronomy_data.get_json_data(FILE_PATH)
-
     if not isinstance(data, dict):
         raise TypeError(f"Expected to receive a dict, got {type(data)}")
     if len(data) > 0:

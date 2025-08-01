@@ -1,23 +1,18 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
 import os
-import json
 from datetime import datetime, timedelta
 
 import psycopg2
 import requests
+from dotenv import load_dotenv
 
-from astronomy_utils import make_request_headers
-
-# Folder path for the json output
-DATA_FILEPATH = '../data/'
-
-COORDINATES = {
-    "lat": +51.30,
-    "lon": -00.05
-}
+import astronomy_utils
 
 def get_db_connection() -> psycopg2.extensions.connection:
-    """Returns a connection to the starwatch RDS database"""
+    """
+    Returns a connection to the starwatch RDS database
+    Assumes a .env has been loaded with the appropriate keys
+    """
     try:
         conn_string = f"""
         host='{os.environ.get("db_host")}'
@@ -71,9 +66,8 @@ def get_planetary_positions(
     coordinates: dict[str:float],
     dates: dict[str:datetime.date],
     header: dict[str:str],
-    data_filepath: str,
     time: str=str(datetime.now().time().strftime("%H:%M:%S"))
-) -> bool:
+) -> dict:
     '''
     Gets information on planetary bodies from current day
     to next 7 days and saves it to a file as JSON
@@ -90,41 +84,14 @@ def get_planetary_positions(
         timeout=20
     )
 
-    return handle_response(response, data_filepath)
-
-
-def handle_response(response: requests.Response, data_filepath: str) -> bool:
-    """Handles the API response; prints errors on fail and dumps to JSON on success"""
-    if response.status_code == 200:
-        json_path = make_dump_path(data_filepath)
-        dump_json_data(response, json_path)
-        return True
-
-    print(f'Error {response.status_code}, {response.json()}')
-    return False
-
-
-def dump_json_data(response: requests.Response, json_path: str) -> None:
-    """Dumps data in a context manager to ensure proper closing"""
     if not isinstance(response, requests.Response):
         raise TypeError(
-            f"Expected to serialise a Response object, got {type(response)}")
-    if not isinstance(json_path, str):
-        raise TypeError("Passed json_path must be a string")
-    if len(json_path) == 0:
-        raise ValueError("Given empty string for json_path")
-    with open(json_path, 'w',  encoding='utf-8') as f:
-        json.dump(response.json(), f, indent=2)
+            f"Expected a Response object, got {type(response)}")
 
+    if response.status_code == 200:
+        return response.json()
 
-def make_dump_path(data_filepath: str) -> str:
-    """Ensures the data directory exists and returns a path to it"""
-    os.makedirs(data_filepath, exist_ok=True)
-    json_path = os.path.join(
-        data_filepath,
-        'planetary_data.json'
-    )
-    return json_path
+    raise RuntimeError(f"Error {response.status_code}, {response.json()}")
 
 
 def get_positions_url(
@@ -146,12 +113,14 @@ def get_positions_url(
 
 
 if __name__ == "__main__":
+    load_dotenv()
     connection = get_db_connection()
-    DATES = get_date_range(connection)
 
-    get_planetary_positions(
-        COORDINATES,
-        DATES,
-        make_request_headers(),
-        DATA_FILEPATH
+    data = get_planetary_positions(
+        { # coordinates dict
+            "lat": +51.30,
+            "lon": -00.05
+        },
+        get_date_range(connection),
+        astronomy_utils.make_request_headers()
     )
