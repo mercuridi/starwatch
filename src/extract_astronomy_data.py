@@ -6,7 +6,7 @@ import psycopg2
 import requests
 from dotenv import load_dotenv
 
-import astronomy_utils
+import src.astronomy_utils
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
@@ -73,9 +73,6 @@ def get_planetary_positions(
     to next 7 days and saves it to a file as JSON
     '''
 
-    # String concatenation method to ensure one line
-    # is broken into multiple for readability.
-    # '+' is optional but included for clarity
     planetary_positions_url = get_positions_url(coordinates, dates, time)
 
     response = requests.get(
@@ -100,6 +97,9 @@ def get_positions_url(
     time: str
 ) -> str:
     """Constructs the API endpoint for the planetary positions data"""
+    # String concatenation method to ensure one line
+    # is broken into multiple for readability.
+    # '+' is optional but included for clarity
     planetary_positions_url: str = (
         "https://api.astronomyapi.com/api/v2/bodies/positions"
         + f"?latitude={coordinates['lat']}"
@@ -122,5 +122,5 @@ if __name__ == "__main__":
             "lon": -00.05
         },
         get_date_range(connection),
-        astronomy_utils.make_request_headers()
+        src.astronomy_utils.make_request_headers()
     )
