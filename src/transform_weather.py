@@ -63,19 +63,3 @@ def transform_daily_data(data: pd.DataFrame) -> pd.DataFrame:
         float).round(1)
 
     return data
-
-
-if __name__ == "__main__":
-    client = get_client(3600)
-    response = get_response(51.5085, -0.1257, client)
-
-    # current_data = process_current_data(response)
-    # print(current_data)
-    # print(transform_current_data(current_data))
-
-    # hourly_data = process_hourly_data(response)
-    # print(transform_hourly_data(hourly_data).columns[0])
-
-    daily_data = process_daily_data(response)
-    print(daily_data)
-    print(transform_daily_data(daily_data))
