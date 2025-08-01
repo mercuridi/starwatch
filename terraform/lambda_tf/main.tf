@@ -105,7 +105,7 @@ resource "aws_scheduler_schedule" "lambda_every_minute" {
 
   # change below settings as needed
   schedule_expression = "rate(1 minute)"
-  state               = "DISABLED"  # Change to ENABLED once ready
+  state               = "ENABLED"  # Change to ENABLED once ready
 
   flexible_time_window {
     mode = "OFF"
@@ -142,7 +142,27 @@ resource "aws_route_table" "private_rt" {
   }
 }
 
+
+# Not working? Complains about the route already existing for some reason
+# I *think* this is because of the route block in the above route table resource
+# The CIDR block being set to all addresses means the below association "already exists"
+
 # resource "aws_route_table_association" "private_assoc" {
 #   subnet_id      = var.private_subnet_id
 #   route_table_id = aws_route_table.private_rt.id
+# }
+
+
+# Below block acts as a "wipe" for the route table
+# Uncomment this and comment out the actual route table definition
+
+# and then terraform apply if you need to use it
+# resource "aws_route_table" "private_rt" {
+#   vpc_id = var.vpc_id
+
+#   route = []
+
+#   tags = {
+#     Name = "Removed all associations"
+#   }
 # }
