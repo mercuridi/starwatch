@@ -1,5 +1,7 @@
 # pylint: skip-file
 
+from src.extract_weather import (get_client, get_response, process_current_data,
+                                 process_hourly_data, process_daily_data, convert_unix_timestamp)
 from unittest.mock import MagicMock
 import pytest
 import pandas as pd
@@ -65,4 +67,3 @@ def test_process_current_data_runtime_error():
 
     with pytest.raises(RuntimeError):
         process_current_data(mock_response)
-
