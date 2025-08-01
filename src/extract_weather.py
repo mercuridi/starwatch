@@ -11,12 +11,15 @@ from retry_requests import retry
 
 def get_client(cache_expiry: int) -> openmeteo_requests.Client:
     """Returns Open-Meteo requests client"""
-    cache_session = requests_cache.CachedSession(
-        '.cache', expire_after=cache_expiry
-    )
-    retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
-
-    return openmeteo_requests.Client(session=retry_session)
+    try:
+        cache_session = requests_cache.CachedSession(
+            '.cache', expire_after=cache_expiry
+        )
+        retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
+        return openmeteo_requests.Client(session=retry_session)
+    
+    except Exception:
+        raise RuntimeError("Unable to return client")
 
 
 def get_response(latitude: float, longitude: float,
@@ -37,23 +40,29 @@ def get_response(latitude: float, longitude: float,
         "timezone": "GMT",
         "forecast_days": 7,
     }
-    return client.weather_api(url, params=params)[0]
+    try:
+        return client.weather_api(url, params=params)[0]
+    except Exception:
+        raise RuntimeError("Unable to get response")
 
 
 def process_current_data(response: WeatherApiResponse) -> tuple[float]:
     """Returns tuple listing the current weather data from the API response"""
-    current = response.Current()
+    try:
+        current = response.Current()
 
-    current_temperature_2m       = current.Variables(0).Value()
-    current_relative_humidity_2m = current.Variables(1).Value()
-    current_wind_speed_10m       = current.Variables(2).Value()
-    current_wind_gusts_10m       = current.Variables(3).Value()
-    current_precipitation        = current.Variables(4).Value()
-    current_cloud_cover          = current.Variables(5).Value()
+        current_temperature_2m       = current.Variables(0).Value()
+        current_relative_humidity_2m = current.Variables(1).Value()
+        current_wind_speed_10m       = current.Variables(2).Value()
+        current_wind_gusts_10m       = current.Variables(3).Value()
+        current_precipitation        = current.Variables(4).Value()
+        current_cloud_cover          = current.Variables(5).Value()
 
-    return (current_temperature_2m, current_relative_humidity_2m, current_wind_speed_10m,
-            current_wind_gusts_10m, current_precipitation, current_cloud_cover)
-
+        return (current_temperature_2m, current_relative_humidity_2m, current_wind_speed_10m,
+                current_wind_gusts_10m, current_precipitation, current_cloud_cover)
+    
+    except Exception:
+        raise RuntimeError("Unable to return current weather data")
 
 
 def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
