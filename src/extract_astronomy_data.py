@@ -58,12 +58,12 @@ def check_data_in_tables(conn: psycopg2.extensions.connection) -> bool:
     Returns True if tables have data - false if tables are empty"""
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM forecast;
     """)
     forecast_count = cursor.fetchone()[0]
     cursor.execute("""
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM distance;
     """)
     distance_count = cursor.fetchone()[0]
