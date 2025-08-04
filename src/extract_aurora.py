@@ -30,7 +30,9 @@ def extract_status_description_for_colour(status_descriptions_dict: dict, colour
     colour = colour.title()
     colour_order = ["Green", "Yellow", "Amber", "Red"]
 
+    # Finds index of colour in status description
     colour_data = status_descriptions_dict[colour_order.index(colour)]
+
     description = colour_data.get("description").get("#text")
     meaning = colour_data.get("meaning").get("#text")
 
