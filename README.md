@@ -9,11 +9,16 @@ Quickly get insights to your favourite constellations and information on the bes
     - Contains github-related utilities including CI/CD instructions.
 - assets
     - Contains useful utility files for other parts of the project.
-    - eg. architecture diagrams
+- dashboard
+    - Contains the source code for *only* the user-facing dashboard.
 - data
     - Contains data dumps for project scripts.
+- docker
+    - Contains dockerfiles and deploy scripts for containerisation of the project.
 - src
     - Contains source code for the different pipelines of the project.
+- terraform
+    - Contains various terraform files for different provisioned AWS resources
 - test
     - Contains various tests for the different scripts in the project.
 - Top level
@@ -34,7 +39,10 @@ There are many things you may wish to do with the project:
 - Run pytest: `python3 -m pytest test/`
 - Run pytest coverage checks: `python3 -m pytest --cov=src --cov-report term-missing test/`
 - Run pylint: `python3 -m pylint *.py`
-- Build the docker image: `docker buildx build . --provenance=false --platform=linux/amd64 --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
+- Build the docker image for the astronomy pipeline: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
+- Build the docker image for the dashboard: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/dashboard.Dockerfile`
+- Directly deploy the astronomy pipeline to AWS (build and push): `docker/deploy_astronomy.sh`
+    - Warning!!! Pushing the image to ECR will *not* update any linked Lambdas. You need to make sure the Lambda is using the updated image yourself. **Terraform will not do this for you!!!**
 
 ## Terraform
 This folder contains the sub-folders: `rds_tf`, `s3_tf`, and `ecr_tf`.

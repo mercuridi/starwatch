@@ -11,5 +11,5 @@ retry-requests
 numpy
 pandas
 sqlalchemy
-psycopg2
+psycopg2-binary
 streamlit
