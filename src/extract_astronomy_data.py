@@ -86,7 +86,7 @@ def get_date_range(conn) -> dict[str, datetime.date]:
     else:
         date_range = {
             "start": today,
-            "end": today + timedelta(days=6)
+            "end": today + timedelta(days=7)
         }
 
     print(f"Downloaded data from {date_range['start']} to {date_range['end']}")
