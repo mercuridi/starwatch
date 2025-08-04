@@ -108,8 +108,8 @@ resource "aws_scheduler_schedule" "lambda_every_minute" {
   group_name = "default"
 
   # change below settings as needed
-  schedule_expression = "rate(1 minute)"
-  state               = "DISABLED"  # Change to ENABLED once ready
+  schedule_expression = "rate(1 day)"
+  state               = "ENABLED"  # Change to ENABLED once ready
 
   flexible_time_window {
     mode = "OFF"
