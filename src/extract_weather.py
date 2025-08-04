@@ -1,6 +1,6 @@
 """Extract script for the Open-Meteo API data"""
 
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 import openmeteo_requests
 from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
@@ -97,7 +97,7 @@ def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
 
 def convert_unix_timestamp(unix_timestamp: int) -> str:
     """Returns unix timestamp as a datetime string"""
-    return datetime.fromtimestamp(unix_timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.fromtimestamp(unix_timestamp, timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
 
 def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
