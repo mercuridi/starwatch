@@ -11,10 +11,8 @@ def construct_astronomy_api_auth():
         - applicationSecret
     Constructs & returns an authorisation string for the Astronomy API
     """
-    user_pass = f"{os.environ.get('applicationId')}:{os.environ.get('applicationSecret')}"
+    user_pass = f"{os.environ.get('APPLICATION_ID')}:{os.environ.get('APPLICATION_SECRET')}"
     auth_string = base64.b64encode(user_pass.encode()).decode()
-    print(user_pass)
-    print(auth_string)
     return auth_string
 
 def make_request_headers():
@@ -28,5 +26,4 @@ def make_request_headers():
         'Authorization': f'Basic {construct_astronomy_api_auth()}',
         'Content-Type': 'application/json'
     }
-    print(headers)
     return headers

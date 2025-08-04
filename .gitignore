@@ -8,6 +8,8 @@ terraform.tfvars
 **/.terraform/*
 .terraform.lock.hcl
 
-*.json
 __pycache__
 .coverage
+
+regions.json
+planetary_data.json
