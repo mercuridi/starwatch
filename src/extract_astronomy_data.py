@@ -81,12 +81,12 @@ def get_date_range(conn) -> dict[str, datetime.date]:
     if check_data_in_tables(conn):
         date_range = {
             "start": date_week_from_now,
-            "end": date_week_from_now + timedelta(days=1)
+            "end": date_week_from_now
         }
     else:
         date_range = {
             "start": today,
-            "end": today + timedelta(days=7)
+            "end": today + timedelta(days=6)
         }
 
     print(f"Downloaded data from {date_range['start']} to {date_range['end']}")
