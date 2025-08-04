@@ -3,12 +3,13 @@
 import os
 from datetime import datetime, timedelta
 
-import openmeteo_requests
-from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
 import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine, text, Engine
 from dotenv import load_dotenv
+
+import openmeteo_requests
+from openmeteo_sdk.WeatherApiResponse import WeatherApiResponse
 
 
 from src.extract_weather import (get_client, get_response,
@@ -18,7 +19,7 @@ from src.transform_weather import (transform_current_data, transform_hourly_data
                                    transform_daily_data)
 
 
-def create_regions_dataframe():
+def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
 
     # lat/long pairs snatched from Wikipedia
@@ -212,7 +213,7 @@ def get_db_connection() -> Engine:
     return create_engine(url)
 
 
-def get_rds_data(engine: Engine, table_name: str):
+def get_rds_data(engine: Engine, table_name: str) -> pd.DataFrame:
     """Connects to RDS database and returns data corresponding to the table name
     entered.
     """
@@ -240,10 +241,12 @@ def get_all_data(engine: Engine) -> pd.DataFrame:
     all_data = pd.merge(distance_pb_forecast,
                         constellation_df, on="constellation_id")
 
-    return all_data[["planetary_body_name", "date", "constellation_name",
-                     "astronomical_units", "right_ascension_hours", "right_ascension_string",
-                     "declination_degrees", "declination_string", "altitude_degrees",
-                     "altitude_string", "azimuth_degrees", "azimuth_string"]]
+    relevant_data = all_data[["planetary_body_name", "date", "constellation_name",
+                              "astronomical_units", "right_ascension_hours", "right_ascension_string",
+                              "declination_degrees", "declination_string", "altitude_degrees",
+                              "altitude_string", "azimuth_degrees", "azimuth_string"]]
+
+    return relevant_data
 
 
 
@@ -298,10 +301,10 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
                                                                       "Uranus", "Neptune",
                                                                       "Pluto"])
 
-    pb_data = data[data["planetary_body_name"] == planetary_body_option]
+    planetary_body_data = data[data["planetary_body_name"] == planetary_body_option]
 
     today = datetime.today().strftime("%Y-%m-%d")
-    pb_data_today = pb_data[pb_data["date"] == today]
+    pb_data_today = planetary_body_data[planetary_body_data["date"] == today]
 
     a, b = st.columns(2)
     a.metric("Distance from Earth",
@@ -317,20 +320,22 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
         horizontal_button = st.button("Horizontal")
 
     if equatorial_button:
-        transpose_equatorial = format_coordinate_data(pb_data, "equatorial")
+        transpose_equatorial = format_coordinate_data(
+            planetary_body_data, "equatorial")
         st.markdown("##### Equatorial co-ordinates:")
         st.table(transpose_equatorial)
 
     if horizontal_button:
-        transpose_horizontal = format_coordinate_data(pb_data, "horizontal")
+        transpose_horizontal = format_coordinate_data(
+            planetary_body_data, "horizontal")
         st.markdown("##### Horizontal co-ordinates:")
         st.table(transpose_horizontal)
 
 
 
-def main():
-    """Main function"""
-    
+def main() -> None:
+    """Main function to run all necessary code for the dashboard"""
+
     st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
     engine = get_db_connection()
