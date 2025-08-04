@@ -14,6 +14,9 @@ def extract_status_descriptions(status_description_url: str) -> dict:
     """Returns dictionary of relevant status description data from the API response"""
 
     response = requests.get(status_description_url)
+    if response.status_code != 200:
+        raise RuntimeError("Unable to retrieve status description data")
+    
     status_descriptions_dict = xmltodict.parse(response.content)
 
     return status_descriptions_dict.get("status_list").get("status")
@@ -38,8 +41,14 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     """Returns dataframe of recent aurora activity data from the API response"""
 
     response = requests.get(activity_data_url)
+    if response.status_code != 200:
+        raise RuntimeError("Unable to retrieve activity data")
 
     activity_dict = xmltodict.parse(response.content)
     activity_data = activity_dict.get("site_activity").get("activity")
 
     return pd.DataFrame(activity_data)
+
+
+response = requests.get(STATUS_DESCRIPTION_URL)
+print(response.status_code)
