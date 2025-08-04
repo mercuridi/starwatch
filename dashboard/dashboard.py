@@ -18,6 +18,9 @@ from src.extract_weather import (get_client, get_response,
 from src.transform_weather import (transform_current_data, transform_hourly_data,
                                    transform_daily_data)
 
+import src.astronomy_utils
+from src.moon_phase_extract import get_moon_phase_image
+
 
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
@@ -70,7 +73,6 @@ def create_regions_dataframe() -> pd.DataFrame:
     return pd.DataFrame(data=regions)
 
 
-
 def create_response_for_region(region_name: str, regions: pd.DataFrame,
                                weather_client: openmeteo_requests.Client) -> WeatherApiResponse:
     """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing 
@@ -85,12 +87,11 @@ def create_response_for_region(region_name: str, regions: pd.DataFrame,
         latitude=region_latitude, longitude=region_longitude, client=weather_client)
 
 
-
 def display_current_weather_metrics(current_data: tuple[str], daily_data: pd.DataFrame) -> None:
     """Displays streamlit metrics for current weather statistics"""
 
     sunrise = str(daily_data["Sunrise"][0]) + "am"
-    sunset  = str(daily_data["Sunset"][0]) + "pm"
+    sunset = str(daily_data["Sunset"][0]) + "pm"
 
     a, b, c, d = st.columns(4)
     e, f, g, h = st.columns(4)
@@ -105,7 +106,6 @@ def display_current_weather_metrics(current_data: tuple[str], daily_data: pd.Dat
     h.metric("Sunset", sunset, border=True)
 
 
-
 def display_hourly_graphs(hourly_data: pd.DataFrame) -> None:
     """Displays selectable graphs for hourly weather data"""
 
@@ -113,7 +113,8 @@ def display_hourly_graphs(hourly_data: pd.DataFrame) -> None:
                                                 "Relative Humidity", "Visibility",
                                                 "Wind Speed", "Wind Gusts"])
     if option == "Temperature":
-        st.line_chart(hourly_data, x="Date", y="Temperature (°C)", x_label="Time")
+        st.line_chart(hourly_data, x="Date",
+                      y="Temperature (°C)", x_label="Time")
     if option == "Relative Humidity":
         st.line_chart(hourly_data, x="Date",
                       y="Relative Humidity (%)", x_label="Time")
@@ -129,7 +130,6 @@ def display_hourly_graphs(hourly_data: pd.DataFrame) -> None:
     if option == "Cloud Cover":
         st.line_chart(hourly_data, x="Date",
                       y="Cloud Cover (%)", x_label="Time")
-
 
 
 def display_daily_graphs(daily_data: pd.DataFrame) -> None:
@@ -152,7 +152,7 @@ def display_daily_graphs(daily_data: pd.DataFrame) -> None:
                       y="Minimum Temperature (°C)")
     if option == "Sunrise":
         st.scatter_chart(daily_data, x="Date",
-                      y="Sunrise")
+                         y="Sunrise")
     if option == "Sunset":
         st.scatter_chart(daily_data, x="Date",
                          y="Sunset")
@@ -194,6 +194,24 @@ def weather_section() -> None:
     st.subheader("Weekly Weather Forecast", divider="blue")
     display_daily_graphs(transform_daily_weather)
 
+    # Gets the lat/lon of the selected region
+    region_lat_long = regions_df[regions_df["region_name"] == region_option]
+    latitude = region_lat_long["latitude"].values[0]
+    longitude = region_lat_long["longitude"].values[0]
+
+    # Runs the moon phase API call and saves image in data
+    get_moon_phase_image(
+        latitude,
+        longitude,
+        str(datetime.now().date()),
+        src.astronomy_utils.make_request_headers()
+    )
+    moon_phase_img_file_path = 'data/moon_phase.jpg'
+    st.image(
+        moon_phase_img_file_path,
+        caption=f"Moon phase for Today",
+        use_container_width=True
+    )
 
 
 def get_db_connection() -> Engine:
@@ -223,7 +241,6 @@ def get_rds_data(engine: Engine, table_name: str) -> pd.DataFrame:
     return rds_data
 
 
-
 def get_all_data(engine: Engine) -> pd.DataFrame:
     """Returns all relevant data from the database to be displayed in the dashboard"""
 
@@ -249,7 +266,6 @@ def get_all_data(engine: Engine) -> pd.DataFrame:
     return relevant_data
 
 
-
 def format_coordinate_data(planetary_body_data: pd.DataFrame, coordinate_type: str) -> pd.DataFrame:
     """Transforms dataframe in an ideal format to display on the dashboard"""
 
@@ -271,7 +287,7 @@ def format_coordinate_data(planetary_body_data: pd.DataFrame, coordinate_type: s
 
     # Extract one week of data from today
     today = pd.Timestamp("today").normalize()
-    one_week = today + timedelta(days=7)
+    one_week = today + timedelta(days=6)
     one_week_data = relevant_data.loc[(relevant_data["date"] >= today) & (
         relevant_data["date"] <= one_week)].copy()
 
@@ -301,7 +317,8 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
                                                                       "Uranus", "Neptune",
                                                                       "Pluto"])
 
-    planetary_body_data = data[data["planetary_body_name"] == planetary_body_option]
+    planetary_body_data = data[data["planetary_body_name"]
+                               == planetary_body_option]
 
     today = datetime.today().strftime("%Y-%m-%d")
     pb_data_today = planetary_body_data[planetary_body_data["date"] == today]
@@ -311,7 +328,6 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
              str(pb_data_today["astronomical_units"].iloc[0]) + " AU", border=True)
     b.metric("Constellation",
              pb_data_today["constellation_name"].iloc[0], border=True)
-
 
     col1, col2 = st.columns(2)
     with col1:
@@ -332,7 +348,6 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
         st.table(transpose_horizontal)
 
 
-
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
@@ -345,7 +360,7 @@ def main() -> None:
     st.header(
         ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
         ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: "
-        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: " \
+        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
         ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
 
     weather_section()
