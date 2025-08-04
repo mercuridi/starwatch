@@ -45,16 +45,5 @@ def get_moon_phase_image(latitude, longitude, date, headers, save_path='data/moo
         with open(save_path, 'wb') as f:
             f.write(img_data)
 
-        print(f"[Success] Moon phase image saved to {save_path}")
-
     except Exception as e:
         print(f"[Error] Failed to download or save moon phase image: {e}")
-
-
-if __name__ == "__main__":
-    img = get_moon_phase_image(
-        +51.30,
-        -00.05,
-        '2004-03-03',
-        src.astronomy_utils.make_request_headers()
-    )
