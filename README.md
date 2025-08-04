@@ -42,6 +42,7 @@ There are many things you may wish to do with the project:
 - Build the docker image for the astronomy pipeline: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/astronomy.Dockerfile`
 - Build the docker image for the dashboard: `docker buildx build . --provenance=false --platform=linux/arm64 --no-cache --tag astronomy_pipeline:latest --file docker/dashboard.Dockerfile`
 - Directly deploy the astronomy pipeline to AWS (build and push): `docker/deploy_astronomy.sh`
+    - Warning!!! Pushing the image to ECR will *not* update any linked Lambdas. You need to make sure the Lambda is using the updated image yourself. **Terraform will not do this for you!!!**
 
 ## Terraform
 This folder contains the sub-folders: `rds_tf`, `s3_tf`, and `ecr_tf`.

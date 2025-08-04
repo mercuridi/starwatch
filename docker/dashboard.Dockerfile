@@ -1,7 +1,7 @@
 # Dockerfile for the dashboard ECS service
 # Must be run from top-level
 
-# Start from lambda Python3.8 image
+# Start from lambda Python3.11 image
 FROM python:3.11
 
 # Copy requirements
