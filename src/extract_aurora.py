@@ -48,7 +48,3 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     activity_data = activity_dict.get("site_activity").get("activity")
 
     return pd.DataFrame(activity_data)
-
-
-response = requests.get(STATUS_DESCRIPTION_URL)
-print(response.status_code)
