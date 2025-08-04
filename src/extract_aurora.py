@@ -1,3 +1,4 @@
+"""Extract script for aurora activity and relevant metadata"""
 
 import xmltodict
 import requests
@@ -13,10 +14,10 @@ STATUS_DESCRIPTION_URL = "http://aurorawatch-api.lancs.ac.uk/0.2/status-descript
 def extract_status_descriptions(status_description_url: str) -> dict:
     """Returns dictionary of relevant status description data from the API response"""
 
-    response = requests.get(status_description_url)
+    response = requests.get(status_description_url, timeout=10)
     if response.status_code != 200:
         raise RuntimeError("Unable to retrieve status description data")
-    
+
     status_descriptions_dict = xmltodict.parse(response.content)
 
     return status_descriptions_dict.get("status_list").get("status")
@@ -40,7 +41,7 @@ def extract_status_description_for_colour(status_descriptions_dict: dict, colour
 def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     """Returns dataframe of recent aurora activity data from the API response"""
 
-    response = requests.get(activity_data_url)
+    response = requests.get(activity_data_url, timeout=10)
     if response.status_code != 200:
         raise RuntimeError("Unable to retrieve activity data")
 
