@@ -5,7 +5,6 @@ import pandas as pd
 
 FILE_PATH = "../data/planetary_data.json"
 
-
 def get_json_data(file_path: str) -> dict:
     '''Gets JSON from file and returns'''
     try:
@@ -41,36 +40,36 @@ def filter_data(json_data: dict) -> pd.DataFrame:
 def add_record(longitude, latitude, records, name, record):
     """Wrapper around append line for modularisation of script"""
     records.append({
-                # Gets date in YYYY-MM-DD
-                "date":
-                    record['date'].split("T")[0],
-                "latitude":
-                    latitude,
-                "longitude":
-                    longitude,
-                "planetary_body":
-                    name,
-                "constellation":
-                    record['position']['constellation']['name'],
-                "right_ascension_hours":
-                    record['position']['equatorial']['rightAscension']['hours'],
-                "right_ascension_string":
-                    record['position']['equatorial']['rightAscension']['string'],
-                "declination_degrees":
-                    record['position']['equatorial']['declination']['degrees'],
-                "declination_string":
-                    record['position']['equatorial']['declination']['string'],
-                "astronomical_units":
-                    record['distance']['fromEarth']['au'],
-                "altitude_degrees":
-                    record['position']['horizontal']['altitude']['degrees'],
-                "altitude_string":
-                    record['position']['horizontal']['altitude']['string'],
-                "azimuth_degrees":
-                    record['position']['horizontal']['azimuth']['degrees'],
-                "azimuth_string":
-                    record['position']['horizontal']['azimuth']['string']
-            })
+        # Gets date in YYYY-MM-DD
+        "date":
+            record['date'].split("T")[0],
+        "latitude":
+            latitude,
+        "longitude":
+            longitude,
+        "planetary_body":
+            name,
+        "constellation":
+            record['position']['constellation']['name'],
+        "right_ascension_hours":
+            record['position']['equatorial']['rightAscension']['hours'],
+        "right_ascension_string":
+            record['position']['equatorial']['rightAscension']['string'],
+        "declination_degrees":
+            record['position']['equatorial']['declination']['degrees'],
+        "declination_string":
+            record['position']['equatorial']['declination']['string'],
+        "astronomical_units":
+            record['distance']['fromEarth']['au'],
+        "altitude_degrees":
+            record['position']['horizontal']['altitude']['degrees'],
+        "altitude_string":
+            record['position']['horizontal']['altitude']['string'],
+        "azimuth_degrees":
+            record['position']['horizontal']['azimuth']['degrees'],
+        "azimuth_string":
+            record['position']['horizontal']['azimuth']['string']
+    })
 
 
 if __name__ == "__main__":
