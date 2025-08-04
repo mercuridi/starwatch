@@ -36,6 +36,7 @@ def test_add_record(raw_data):
     add_record(longitude, latitude, records, name, body['cells'][0])
 
     assert len(records) == 1
+
     added_record = records[0]
     assert added_record["date"] == '2025-08-10'
     assert added_record["latitude"] == 51.3
