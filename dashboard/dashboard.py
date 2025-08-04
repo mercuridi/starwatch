@@ -184,16 +184,6 @@ def weather_section() -> None:
     transform_hourly_weather = transform_hourly_data(extract_hourly_weather)
     transform_daily_weather = transform_daily_data(extract_daily_weather)
 
-    st.subheader("Current Weather Stats", divider="blue")
-    display_current_weather_metrics(
-        transform_current_weather, transform_daily_weather)
-
-    st.subheader("24 Hour Weather Forecast", divider="blue")
-    display_hourly_graphs(transform_hourly_weather)
-
-    st.subheader("Weekly Weather Forecast", divider="blue")
-    display_daily_graphs(transform_daily_weather)
-
     # Gets the lat/lon of the selected region
     region_lat_long = regions_df[regions_df["region_name"] == region_option]
     latitude = region_lat_long["latitude"].values[0]
@@ -207,11 +197,28 @@ def weather_section() -> None:
         src.astronomy_utils.make_request_headers()
     )
     moon_phase_img_file_path = 'data/moon_phase.jpg'
-    st.image(
-        moon_phase_img_file_path,
-        caption=f"Moon phase for Today",
-        use_container_width=True
-    )
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        st.markdown(f"### 🌓 Moon Phase")
+        st.markdown(f"**Region:** {region_option}")
+        st.markdown(f"**Date:** {datetime.now().strftime('%A, %-d %B %Y')}")
+
+    with col2:
+        st.image(
+            moon_phase_img_file_path
+        )
+
+    st.subheader("Current Weather Stats", divider="blue")
+    display_current_weather_metrics(
+        transform_current_weather, transform_daily_weather)
+
+    st.subheader("24 Hour Weather Forecast", divider="blue")
+    display_hourly_graphs(transform_hourly_weather)
+
+    st.subheader("Weekly Weather Forecast", divider="blue")
+    display_daily_graphs(transform_daily_weather)
 
 
 def get_db_connection() -> Engine:
