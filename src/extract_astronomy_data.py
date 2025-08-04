@@ -7,7 +7,7 @@ import psycopg2
 import requests
 from dotenv import load_dotenv
 
-import astronomy_utils
+import src.astronomy_utils
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             "lon": -00.05
         },
         get_date_range(connection),
-        astronomy_utils.make_request_headers()
+        src.astronomy_utils.make_request_headers()
     )
 
     with open('astronomy_test_data.json', 'w', encoding="utf8") as f:
