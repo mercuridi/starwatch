@@ -203,7 +203,7 @@ def weather_section() -> None:
     with col1:
         st.markdown(f"### 🌓 Moon Phase")
         st.markdown(f"**Region:** {region_option}")
-        st.markdown(f"**Date:** {datetime.now().strftime('%A, %-d %B %Y')}")
+        st.markdown(f"**Date:** {datetime.now().date()}")
 
     with col2:
         st.image(
