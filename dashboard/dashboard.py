@@ -1,5 +1,6 @@
 """Dashboard script"""
 
+# pylint:disable=import-error
 import os
 from datetime import datetime, timedelta
 
@@ -196,18 +197,16 @@ def weather_section() -> None:
         str(datetime.now().date()),
         src.astronomy_utils.make_request_headers()
     )
-    moon_phase_img_file_path = 'data/moon_phase.jpg'
-
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.markdown(f"### 🌓 Moon Phase")
+        st.markdown("### 🌓 Moon Phase")
         st.markdown(f"**Region:** {region_option}")
         st.markdown(f"**Date:** {datetime.now().date()}")
 
     with col2:
         st.image(
-            moon_phase_img_file_path
+            'data/moon_phase.jpg'
         )
 
     st.subheader("Current Weather Stats", divider="blue")
@@ -265,10 +264,20 @@ def get_all_data(engine: Engine) -> pd.DataFrame:
     all_data = pd.merge(distance_pb_forecast,
                         constellation_df, on="constellation_id")
 
-    relevant_data = all_data[["planetary_body_name", "date", "constellation_name",
-                              "astronomical_units", "right_ascension_hours", "right_ascension_string",
-                              "declination_degrees", "declination_string", "altitude_degrees",
-                              "altitude_string", "azimuth_degrees", "azimuth_string"]]
+    relevant_data = all_data[["planetary_body_name",
+                              "date",
+                              "constellation_name",
+                              "astronomical_units",
+                              "right_ascension_hours",
+                              "right_ascension_string",
+                              "declination_degrees",
+                              "declination_string",
+                              "altitude_degrees",
+                              "altitude_string",
+                              "azimuth_degrees",
+                              "azimuth_string"
+                              ]
+                             ]
 
     return relevant_data
 
