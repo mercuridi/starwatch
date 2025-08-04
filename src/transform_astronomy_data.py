@@ -1,7 +1,5 @@
 '''Gets JSON data from specified file, filters for relevant columns and converts into dataframe'''
 
-# pylint:disable=line-too-long
-
 import json
 import pandas as pd
 
@@ -36,7 +34,13 @@ def filter_data(json_data: dict) -> pd.DataFrame:
         # Loops for each date
         for record in planetary_body['cells']:
             # Creates list of dictionaries of all relevant data from JSON
-            records.append({
+            add_record(longitude, latitude, records, name, record)
+
+    return pd.DataFrame(records)
+
+def add_record(longitude, latitude, records, name, record):
+    """Wrapper around append line for modularisation of script"""
+    records.append({
                 # Gets date in YYYY-MM-DD
                 "date":
                     record['date'].split("T")[0],
@@ -67,8 +71,6 @@ def filter_data(json_data: dict) -> pd.DataFrame:
                 "azimuth_string":
                     record['position']['horizontal']['azimuth']['string']
             })
-
-    return pd.DataFrame(records)
 
 
 if __name__ == "__main__":
