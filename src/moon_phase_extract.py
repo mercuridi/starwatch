@@ -63,8 +63,6 @@ def get_moon_phase_image(
         with open(save_path, 'wb') as f:
             f.write(img_data)
 
-        print(f"Success Moon phase image saved to {save_path}")
-
     except Exception as e:
         print(f"Error Failed to download or save moon phase image: {e}")
 
