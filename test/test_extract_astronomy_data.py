@@ -36,12 +36,11 @@ def test_get_date_range_with_data(mock_datetime, mock_conn_with_data):
 
     date_range = get_date_range(mock_conn_with_data)
 
-    expected_start = fake_today.date() + timedelta(days=6)
-    expected_end = expected_start + timedelta(days=1)
+    expected_start = fake_today.date() + timedelta(days=7)
 
     assert date_range == {
         "start": expected_start,
-        "end": expected_end
+        "end": expected_start
     }
 
 
@@ -53,7 +52,7 @@ def test_get_date_range_empty(mock_datetime, mock_conn_empty):
     date_range = get_date_range(mock_conn_empty)
 
     expected_start = fake_today.date()
-    expected_end = expected_start + timedelta(days=6)
+    expected_end = expected_start + timedelta(days=7)
 
     assert date_range == {
         "start": expected_start,
