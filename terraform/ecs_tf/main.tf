@@ -25,8 +25,8 @@ resource "aws_security_group" "c18-starwatch-dashboard-ecr-sg" {
   vpc_id      = data.aws_vpc.c18-vpc.id
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 8501
+    to_port     = 8501
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -97,17 +97,38 @@ resource "aws_ecs_task_definition" "c18-starwatch-td" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn = aws_iam_role.c18-starwatch-ecs-task-exec-role.arn
+  execution_role_arn       = aws_iam_role.c18-starwatch-ecs-task-exec-role.arn
 
   container_definitions = jsonencode([
     {
       name      = "c18-starwatch-dashboard-container"
-      image = "${aws_ecr_repository.c18-starwatch-dashboard-ecr.repository_url}:latest"
+      image     = "${aws_ecr_repository.c18-starwatch-dashboard-ecr.repository_url}:latest"
       essential = true
-      portMappings = [{
-        containerPort = 8501
-        protocol      = "tcp"
-      }]
+      portMappings = [
+        {
+          containerPort = 8501
+          protocol      = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group = "/ecs/c18-starwatch-dashboard-logs"
+          awslogs-region        = "eu-west-2"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
+}
+
+
+resource "aws_cloudwatch_log_group" "c18-starwatch-dashboard-logs" {
+  name              = "/ecs/c18-starwatch-dashboard-logs"
+  retention_in_days = 7
+}
+
+resource "aws_iam_role_policy_attachment" "c18-starwatch-cloudwatch-policy" {
+  role       = aws_iam_role.c18-starwatch-ecs-task-exec-role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
