@@ -23,7 +23,7 @@ def get_passes(lon, lat, n=1, alt=0):
     Adaptations:
         - Updated TLE source from private redis to public API
         - Updated code overall from Python 2.x to 3.13
-        - 
+        - Updated outdated library references to modern ones
     """
 
     # Get latest TLE from Ariss
@@ -31,7 +31,7 @@ def get_passes(lon, lat, n=1, alt=0):
     if tle_req.status_code == 200:
         tle_raw = tle_req.text
     else:
-        raise RuntimeError("Failed to get the TLE required")
+        raise RuntimeError("Failed to get the TLE required for ISS orbit calculation")
     tle = tle_raw.split("\n")
     iss = ephem.readtle(str(tle[0]), str(tle[1]), str(tle[2]))
 
@@ -41,7 +41,7 @@ def get_passes(lon, lat, n=1, alt=0):
     location.long = str(lon)
     location.elevation = alt
 
-    # Override refration calculation
+    # Override refraction calculation
     location.pressure = 0
     location.horizon = '10:00'
 
@@ -77,5 +77,21 @@ def get_passes(lon, lat, n=1, alt=0):
     return obj
 
 
+def present_iss_passes(passes_obj) -> list[tuple[str, int]]:
+    """
+    Converts the calculated ISS passes to human formats
+    The further in the future the prediction, the less accurate!!!
+    The orbit of the ISS decays chaotically and changes often
+    """
+    formatted_passes = []
+    for iss_pass in passes_obj["response"]:
+        formatted_passes.append((
+            # string of the date and time of the pass in UTC
+            str(datetime.fromtimestamp(iss_pass["risetime"], tz=timezone.utc)),
+            # duration of overhead pass in seconds
+            iss_pass["duration"]
+        ))
+    return formatted_passes
+
 if __name__ == "__main__":
-    print(get_passes(40.027435, 40.027435))
+    print(present_iss_passes(get_passes(40.027435, 40.027435)))
