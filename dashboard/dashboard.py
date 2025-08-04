@@ -330,7 +330,7 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
 
 def main():
     """Main function"""
-
+    
     st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
     engine = get_db_connection()
