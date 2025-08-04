@@ -69,27 +69,31 @@ def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
     """Returns a dataframe containing 24 hours of weather information starting from 
     the current hour, from an API response.
     """
-    hourly = response.Hourly()
+    try:
+        hourly = response.Hourly()
 
-    hourly_data = {"Date": pd.date_range(
-        start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-        end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-        freq=pd.Timedelta(seconds=hourly.Interval()),
-        inclusive="left"
-    )}
-    hourly_data["Temperature (°C)"]      = hourly.Variables(0).ValuesAsNumpy()
-    hourly_data["Relative Humidity (%)"] = hourly.Variables(1).ValuesAsNumpy()
-    hourly_data["Precipitation (mm)"]    = hourly.Variables(2).ValuesAsNumpy()
-    hourly_data["Wind Speed (km/h)"]     = hourly.Variables(3).ValuesAsNumpy()
-    hourly_data["Wind Gusts (km/h)"]     = hourly.Variables(4).ValuesAsNumpy()
-    hourly_data["Visibility (m)"]        = hourly.Variables(5).ValuesAsNumpy()
-    hourly_data["Cloud Cover (%)"]       = hourly.Variables(6).ValuesAsNumpy()
+        hourly_data = {"Date": pd.date_range(
+            start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
+            end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+            freq=pd.Timedelta(seconds=hourly.Interval()),
+            inclusive="left"
+        )}
+        hourly_data["Temperature (°C)"]      = hourly.Variables(0).ValuesAsNumpy()
+        hourly_data["Relative Humidity (%)"] = hourly.Variables(1).ValuesAsNumpy()
+        hourly_data["Precipitation (mm)"]    = hourly.Variables(2).ValuesAsNumpy()
+        hourly_data["Wind Speed (km/h)"]     = hourly.Variables(3).ValuesAsNumpy()
+        hourly_data["Wind Gusts (km/h)"]     = hourly.Variables(4).ValuesAsNumpy()
+        hourly_data["Visibility (m)"]        = hourly.Variables(5).ValuesAsNumpy()
+        hourly_data["Cloud Cover (%)"]       = hourly.Variables(6).ValuesAsNumpy()
 
-    hourly_dataframe = pd.DataFrame(data=hourly_data)
+        hourly_dataframe = pd.DataFrame(data=hourly_data)
 
-    # Determines current hour and slices the df from this point +24 hours
-    current_hour = datetime.now().hour
-    return hourly_dataframe.iloc[current_hour:current_hour+24]
+        # Determines current hour and slices the df from this point +24 hours
+        current_hour = datetime.now().hour
+        return hourly_dataframe.iloc[current_hour:current_hour+24]
+    
+    except Exception:
+        raise RuntimeError("Unable to return hourly weather data")
 
 
 def convert_unix_timestamp(unix_timestamp: int) -> str:
@@ -99,21 +103,26 @@ def convert_unix_timestamp(unix_timestamp: int) -> str:
 
 def process_daily_data(response: WeatherApiResponse) -> pd.DataFrame:
     """Returns a dataframe for daily averages of weather data from an API response"""
-    daily = response.Daily()
-    daily_data = {"Date": pd.date_range(
-        start=pd.to_datetime(daily.Time(), unit="s", utc=True),
-        end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
-        freq=pd.Timedelta(seconds=daily.Interval()),
-        inclusive="left"
-    )}
-    daily_data["Sunrise"]                   = daily.Variables(0).ValuesInt64AsNumpy()
-    daily_data["Sunset"]                    = daily.Variables(1).ValuesInt64AsNumpy()
-    daily_data["Maximum Wind Speed (km/h)"] = daily.Variables(2).ValuesAsNumpy()
-    daily_data["Maximum Wind Gusts (km/h)"] = daily.Variables(3).ValuesAsNumpy()
-    daily_data["Maximum Temperature (°C)"]  = daily.Variables(4).ValuesAsNumpy()
-    daily_data["Minimum Temperature (°C)"]  = daily.Variables(5).ValuesAsNumpy()
+    try:
+        daily = response.Daily()
+        daily_data = {"Date": pd.date_range(
+            start=pd.to_datetime(daily.Time(), unit="s", utc=True),
+            end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
+            freq=pd.Timedelta(seconds=daily.Interval()),
+            inclusive="left"
+        )}
+        daily_data["Sunrise"]                   = daily.Variables(0).ValuesInt64AsNumpy()
+        daily_data["Sunset"]                    = daily.Variables(1).ValuesInt64AsNumpy()
+        daily_data["Maximum Wind Speed (km/h)"] = daily.Variables(2).ValuesAsNumpy()
+        daily_data["Maximum Wind Gusts (km/h)"] = daily.Variables(3).ValuesAsNumpy()
+        daily_data["Maximum Temperature (°C)"]  = daily.Variables(4).ValuesAsNumpy()
+        daily_data["Minimum Temperature (°C)"]  = daily.Variables(5).ValuesAsNumpy()
 
-    df = pd.DataFrame(data=daily_data)
-    df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
-    df["Sunset"] = df["Sunset"].apply(convert_unix_timestamp)
-    return df
+        df = pd.DataFrame(data=daily_data)
+        df["Sunrise"] = df["Sunrise"].apply(convert_unix_timestamp)
+        df["Sunset"] = df["Sunset"].apply(convert_unix_timestamp)
+
+        return df
+    
+    except Exception:
+        raise RuntimeError("Unable to return daily weather data")
