@@ -24,7 +24,7 @@ def filter_data(json_data: dict) -> pd.DataFrame:
     Converts dictionary into a dataframe and returns
     '''
     longitude = json_data['data']['observer']['location']['longitude']
-    latitude  = json_data['data']['observer']['location']['latitude']
+    latitude = json_data['data']['observer']['location']['latitude']
     data_of_planetary_bodies = json_data['data']['table']['rows']
 
     records = []
@@ -56,8 +56,8 @@ def filter_data(json_data: dict) -> pd.DataFrame:
                     record['position']['equatorial']['declination']['degrees'],
                 "declination_string":
                     record['position']['equatorial']['declination']['string'],
-                "distance_km":
-                    record['distance']['fromEarth']['km'],
+                "astronomical_units":
+                    record['distance']['fromEarth']['au'],
                 "altitude_degrees":
                     record['position']['horizontal']['altitude']['degrees'],
                 "altitude_string":
@@ -78,4 +78,3 @@ if __name__ == "__main__":
         raise TypeError(f"Expected to receive a dict, got {type(data)}")
     if len(data) > 0:
         transformed_data = filter_data(data)
-        print(transformed_data)

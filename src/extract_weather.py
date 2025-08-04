@@ -64,7 +64,6 @@ def process_current_data(response: WeatherApiResponse) -> tuple[float]:
     except Exception:
         raise RuntimeError("Unable to return current weather data")
 
-
 def process_hourly_data(response: WeatherApiResponse) -> pd.DataFrame:
     """Returns a dataframe containing 24 hours of weather information starting from 
     the current hour, from an API response.
