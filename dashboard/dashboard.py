@@ -27,6 +27,8 @@ from src.aurora_etl import extract_activity_data, find_most_recent_status_info
 
 from src.extract_nasa import get_image_details, get_neos
 
+from src.iss_etl import get_iss_lat_long_now, get_passes, present_iss_passes
+
 AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
 
 APOD_URL = "https://api.nasa.gov/planetary/apod"
@@ -221,6 +223,16 @@ def weather_section() -> None:
                 moon_phase_url
             )
         )
+    region_lat_long = regions_df[regions_df["region_name"] == region_option]
+    region_latitude = region_lat_long["latitude"].values[0]
+    region_longitude = region_lat_long["longitude"].values[0]
+
+    st.subheader("When will the ISS be next overhead?", divider="blue")
+    region_specific = present_iss_passes(get_passes(
+        lat=region_latitude, lon=region_longitude))[0]
+    c, d = st.columns(2)
+    c.metric("Time", region_specific[0], border=True)
+    d.metric("Number of Passes around Earth", region_specific[1], border=True)
 
     st.subheader("Current Weather Stats", divider="blue")
     display_current_weather_metrics(
@@ -377,6 +389,7 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
         st.table(transpose_horizontal)
 
 
+
 def display_aurora_data(activity_data: pd.DataFrame) -> None:
     """Displays aurora data, including the status colour, a description of the meaning of the
     status colour, and time that the status was created.
@@ -407,7 +420,7 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         st.markdown(f"{description}")
 
 
-def display_APOD():
+def display_APOD() -> None:
     """Displays the Astronomy Picture of the Day, it's title and an explanation from NASA
 
     If there's no image for the day, displays no image today message to the user"""
@@ -436,18 +449,32 @@ def display_APOD():
         )
 
 
-def display_NEOs():
+def display_NEOs() -> None:
     """Displays the day's Near-Earth objects and their associated metrics"""
+
+
+
+def display_iss_data() -> None:
+    st.subheader(
+        "International Space Station :rocket:", divider="blue")
+    
+    st.markdown("#### Current Location")
+    current_location = get_iss_lat_long_now()
+    a, b = st.columns(2)
+    b.metric("Latitude", current_location[0], border=True)
+    a.metric("Longitude", current_location[1], border=True)
+
 
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
+    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
+
     home, apod, neo = st.tabs(
         ["Home", "Astronomy Picture of the Day", "Near-Earth Objects"])
 
     with home:
-        st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
         engine = get_db_connection()
         all_planetary_data = get_all_data(engine)
@@ -458,6 +485,8 @@ def main() -> None:
             display_aurora_data(aurora_data)
         except RuntimeError:
             st.markdown("Aurora data not currently available")
+
+        display_iss_data()
 
         st.header(
             ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
