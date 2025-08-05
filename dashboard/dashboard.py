@@ -172,17 +172,8 @@ def display_daily_graphs(daily_data: pd.DataFrame) -> None:
                          y="Sunset")
 
 
-def weather_section() -> None:
+def weather_section(regions_df: pd.DataFrame, region_option: str) -> None:
     """Weather section of the dashboard, with selectable region"""""
-
-    st.subheader("Region Selection :world_map:", divider="blue")
-    regions_df = create_regions_dataframe()
-    region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
-                                                      "East of England", "London",
-                                                      "North East & Cumbria", "North West",
-                                                      "Northern Ireland", "Scotland",
-                                                      "South East", "South West",
-                                                      "West Midlands", "Yorkshire & the Humber"])
 
     # Cache weather data for 15 minutes
     weather_client = get_client(cache_expiry=900)
@@ -198,6 +189,22 @@ def weather_section() -> None:
     transform_hourly_weather = transform_hourly_data(extract_hourly_weather)
     transform_daily_weather = transform_daily_data(extract_daily_weather)
 
+    st.subheader("Current Weather Stats", divider="blue")
+    display_current_weather_metrics(
+        transform_current_weather, transform_daily_weather)
+
+    st.subheader("24 Hour Weather Forecast", divider="blue")
+    display_hourly_graphs(transform_hourly_weather)
+
+    st.subheader("Weekly Weather Forecast", divider="blue")
+    display_daily_graphs(transform_daily_weather)
+
+
+
+def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> None:
+    """Displays the moon phase for a selected region"""
+    
+    st.subheader("Moon Phase :waning_gibbous_moon:", divider="blue")
     # Gets the lat/lon of the selected region
     region_lat_long = regions_df[regions_df["region_name"] == region_option]
     latitude = region_lat_long["latitude"].values[0]
@@ -206,7 +213,6 @@ def weather_section() -> None:
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.markdown("### 🌓 Moon Phase")
         st.markdown(f"**Region:** {region_option}")
         st.markdown(f"**Date:** {datetime.now().date()}")
 
@@ -223,26 +229,7 @@ def weather_section() -> None:
                 moon_phase_url
             )
         )
-    region_lat_long = regions_df[regions_df["region_name"] == region_option]
-    region_latitude = region_lat_long["latitude"].values[0]
-    region_longitude = region_lat_long["longitude"].values[0]
 
-    st.subheader("When will the ISS be next overhead?", divider="blue")
-    region_specific = present_iss_passes(get_passes(
-        lat=region_latitude, lon=region_longitude))[0]
-    c, d = st.columns(2)
-    c.metric("Time", region_specific[0], border=True)
-    d.metric("Number of Passes around Earth", region_specific[1], border=True)
-
-    st.subheader("Current Weather Stats", divider="blue")
-    display_current_weather_metrics(
-        transform_current_weather, transform_daily_weather)
-
-    st.subheader("24 Hour Weather Forecast", divider="blue")
-    display_hourly_graphs(transform_hourly_weather)
-
-    st.subheader("Weekly Weather Forecast", divider="blue")
-    display_daily_graphs(transform_daily_weather)
 
 
 def get_db_connection() -> Engine:
@@ -454,7 +441,7 @@ def display_NEOs() -> None:
 
 
 
-def display_iss_data() -> None:
+def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     st.subheader(
         "International Space Station :rocket:", divider="blue")
     
@@ -463,6 +450,19 @@ def display_iss_data() -> None:
     a, b = st.columns(2)
     b.metric("Latitude", current_location[0], border=True)
     a.metric("Longitude", current_location[1], border=True)
+
+    # Gets the lat/lon of the selected region
+    region_lat_long = regions_df[regions_df["region_name"] == region_option]
+    latitude = region_lat_long["latitude"].values[0]
+    longitude = region_lat_long["longitude"].values[0]
+
+    st.markdown("#### When will the ISS be next overhead?")
+    region_specific = present_iss_passes(get_passes(
+        lat=latitude, lon=longitude))[0]
+    c, d = st.columns(2)
+    c.metric("Time", region_specific[0], border=True)
+    d.metric("Number of Passes around Earth", region_specific[1], border=True)
+
 
 
 
@@ -475,6 +475,18 @@ def main() -> None:
         ["Home", "Astronomy Picture of the Day", "Near-Earth Objects"])
 
     with home:
+        st.subheader("Region Selection :world_map:", divider="blue")
+        regions_df = create_regions_dataframe()
+        region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
+                                                      "East of England", "London",
+                                                      "North East & Cumbria", "North West",
+                                                      "Northern Ireland", "Scotland",
+                                                      "South East", "South West",
+                                                      "West Midlands", "Yorkshire & the Humber"])
+
+        display_moon_phase_data(regions_df, region_option)
+        
+        display_iss_data(regions_df, region_option)
 
         engine = get_db_connection()
         all_planetary_data = get_all_data(engine)
@@ -486,7 +498,6 @@ def main() -> None:
         except RuntimeError:
             st.markdown("Aurora data not currently available")
 
-        display_iss_data()
 
         st.header(
             ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
@@ -494,7 +505,7 @@ def main() -> None:
             ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
             ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
 
-        weather_section()
+        weather_section(regions_df, region_option)
 
     with apod:
         st.title("Astronomy Picture of the Day")
