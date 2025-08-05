@@ -27,6 +27,7 @@ from src.aurora_etl import extract_activity_data, find_most_recent_status_info
 
 AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
 
+
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
 
@@ -387,7 +388,7 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "and camera from anywhere in the UK."}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
-                                                                                activity_data)
+                                                                         activity_data)
 
     st.subheader(
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
@@ -398,7 +399,6 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
 
     with st.expander("Description"):
         st.markdown(f"{description}")
-
 
 
 def main() -> None:
