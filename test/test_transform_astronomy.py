@@ -2,13 +2,12 @@
 import json
 
 import pytest
-from unittest.mock import MagicMock, Mock, patch
 
 from src.transform_astronomy_data import filter_data, add_record
 
 @pytest.fixture
 def raw_data():
-    with open("data/astronomy_test_data.json") as f:
+    with open("data/astronomy_test_data.json", encoding="utf-8") as f:
         return json.load(f)
 
 def test_filter_data(raw_data):
