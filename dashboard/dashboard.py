@@ -369,7 +369,7 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
         st.markdown("##### Horizontal co-ordinates:")
         st.table(transpose_horizontal)
 
-    
+
 def display_aurora_data(activity_data: pd.DataFrame) -> None:
     status_description_dict = {
         "Green": "No significant activity. Aurora is unlikely to be visible by "
