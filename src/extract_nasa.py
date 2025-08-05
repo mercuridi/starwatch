@@ -1,6 +1,5 @@
 """Extracts the Astronomy Picture of the Day and Near-Earth Objects from the NASA API"""
 import os
-from typing import Dict, Tuple
 from datetime import date
 import requests as reqs
 from dotenv import load_dotenv
@@ -23,62 +22,68 @@ neo_params = {
 }
 
 
-def get_image_details(url: str, params: Dict[str, str]) -> Tuple[str, str, str] | None:
-    """Retrieves the image title, the image and the image explanation from the NASA API"""
-    response = reqs.get(url, params=params, timeout=30)
+def get_image_details(url: str, apod_query_params: dict[str, str]) -> tuple[str, str, str]:
+    """Retrieves the image title, the image and the image explanation from the NASA API.
 
-    if response.status_code == 200:
-        data = response.json()
+    Raises:
+        RuntimeError: If the API request fails.
+        ValueError: If today's APOD is not an image."""
+    response = reqs.get(url, params=apod_query_params, timeout=30)
 
-        if data.get('media_type') == 'image':
-            title = data.get('title')
-            explanation = data.get('explanation')
-            image_url = data.get('hdurl') or data.get('url')
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Failed to fetch APOD data: {response.status_code} - {response.text}")
 
-            return title, explanation, image_url
+    data = response.json()
 
-        print("Today's APOD is not an image.")
-        return None
+    if data.get('media_type') != 'image':
+        raise ValueError("Today's APOD is not an image.")
 
-    raise RuntimeError(
-        f"Failed to fetch APOD data: {response.status_code} - {response.text}")
+    title = data.get('title')
+    explanation = data.get('explanation')
+    image_url = data.get('hdurl') or data.get('url')
+
+    return title, explanation, image_url
 
 
-def get_neos(url: str, params: Dict[str, str]) -> list[Dict[str, str]]:
-    """Retrieves the information of the objects near Earth today"""
-    response = reqs.get(url, params=params, timeout=30)
+def get_neos(url: str, neo_query_params: dict[str, str]) -> list[dict[str, str]]:
+    """Retrieves the information of the objects near Earth today
 
-    if response.status_code == 200:
-        data = response.json()
-        neos_today = data.get("near_earth_objects", {}).get(TODAY, [])
+    Raises:
+        RuntimeError: If the API request fails."""
+    response = reqs.get(url, params=neo_query_params, timeout=30)
 
-        neo_info = []
-        for neo in neos_today:
-            name = neo.get("name")[1:-1]
-            diameter_min = round(neo.get("estimated_diameter", {}).get(
-                "meters", {}).get("estimated_diameter_min"), 1)
-            diameter_max = round(neo.get("estimated_diameter", {}).get(
-                "meters", {}).get("estimated_diameter_max"), 1)
-            hazardous = neo.get("is_potentially_hazardous_asteroid")
-            approach_data = neo.get("close_approach_data", [{}])[0]
-            miss_distance_km = round(float(approach_data.get(
-                "miss_distance", {}).get("kilometers")), 1)
-            relative_velocity_kmph = round(float(approach_data.get(
-                "relative_velocity", {}).get("kilometers_per_hour")), 1)
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Failed to fetch NEO data: {response.status_code} - {response.text}")
 
-            neo_info.append({
-                "name": name,
-                "diameter_min_m": diameter_min,
-                "diameter_max_m": diameter_max,
-                "hazardous": hazardous,
-                "miss_distance_km": miss_distance_km,
-                "relative_velocity_kmph": relative_velocity_kmph
-            })
+    data = response.json()
+    neos_today = data.get("near_earth_objects", {}).get(TODAY, [])
 
-        return neo_info
+    neo_info = []
+    for neo in neos_today:
+        name = neo.get("name")[1:-1]
+        diameter_min = round(neo.get("estimated_diameter", {}).get(
+            "meters", {}).get("estimated_diameter_min"), 1)
+        diameter_max = round(neo.get("estimated_diameter", {}).get(
+            "meters", {}).get("estimated_diameter_max"), 1)
+        hazardous = neo.get("is_potentially_hazardous_asteroid")
+        approach_data = neo.get("close_approach_data", [{}])[0]
+        miss_distance_km = round(float(approach_data.get(
+            "miss_distance", {}).get("kilometers")), 1)
+        relative_velocity_kmph = round(float(approach_data.get(
+            "relative_velocity", {}).get("kilometers_per_hour")), 1)
 
-    raise RuntimeError(
-        f"Failed to fetch NEO data: {response.status_code} - {response.text}")
+        neo_info.append({
+            "name": name,
+            "diameter_min_m": diameter_min,
+            "diameter_max_m": diameter_max,
+            "hazardous": hazardous,
+            "miss_distance_km": miss_distance_km,
+            "relative_velocity_kmph": relative_velocity_kmph
+        })
+
+    return neo_info
 
 
 if __name__ == "__main__":
