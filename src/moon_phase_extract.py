@@ -42,6 +42,7 @@ def get_moon_phase_image(
         }
     }
 
+    # Post request to get moon phase image
     try:
         response = requests.post(
             moon_phase_url,
@@ -54,6 +55,7 @@ def get_moon_phase_image(
         print(f"Error Failed to fetch moon phase image URL: {e}")
         return
 
+    # Convert & save image url from post request to jpg
     try:
         image_url = response.json()['data']['imageUrl']
         img_data = requests.get(image_url, timeout=300).content
