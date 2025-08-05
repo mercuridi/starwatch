@@ -51,7 +51,7 @@ def get_moon_phase_image(
         )
         response.raise_for_status()
     except requests.RequestException as e:
-        print(f"Error Failed to fetch moon phase image URL: {e}")
+        print(f"Error, failed to fetch moon phase image URL: {e}")
         return
 
     # Convert & return image url from post request to jpg
@@ -62,4 +62,4 @@ def get_moon_phase_image(
         return img_data
 
     except Exception as e:
-        print(f"Error Failed to download or save moon phase image: {e}")
+        print(f"Error, failed to download moon phase image: {e}")
