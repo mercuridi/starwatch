@@ -56,9 +56,11 @@ variable "DB_SCHEMA" {
 variable "APPLICATION_ID" {
     description = "Application ID secret for Astronomy API"
     type = string
+    sensitive = true
 }
 
 variable "APPLICATION_SECRET" {
     description = "Application Secret secret for Astronomy API"
     type = string
+    sensitive = true
 }
