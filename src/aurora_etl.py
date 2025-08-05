@@ -18,8 +18,8 @@ def extract_status_descriptions(status_description_url: str) -> dict:
     response = requests.get(status_description_url, timeout=20)
     if response.status_code != 200:
         raise RuntimeError(
-            "Unable to retrieve status description data."
-            "Error {response.status_code}: {response.text}")
+            "Unable to retrieve status description data. "
+            f"Error {response.status_code}: {response.text}")
 
     status_descriptions_dict = xmltodict.parse(response.content)
 
@@ -47,8 +47,8 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
 
     response = requests.get(activity_data_url, timeout=20)
     if response.status_code != 200:
-        raise RuntimeError(
-            "Unable to retrieve activity data. Error {response.status_code}: {response.text}")
+        raise RuntimeError("Unable to retrieve activity data. "
+                           f"Error {response.status_code}: {response.text}")
 
     activity_dict = xmltodict.parse(response.content)
     activity_data = activity_dict.get("site_activity").get("activity")
@@ -72,19 +72,3 @@ def find_most_recent_status_info(status_descriptions: dict,
     time = datetime_list[1].split("+")[0]
 
     return most_recent_colour, most_recent_status_description, f"{time} {date}"
-
-
-# The 2 status description functions can be removed as the following dictionary can be used instead
-# - this should make the dashboard more efficient as status descriptions don't rely on an API call
-
-# Not sure if this should be left here or copied into the dashboard script
-status_description_dict = {
-    "Green": "No significant activity. Aurora is unlikely to be visible by "
-    "eye or camera from anywhere in the UK.",
-    "Yellow": "Minor geomagnetic activity. Aurora may be visible by eye from "
-    "Scotland and may be visible by camera from Scotland, northern England and Northern Ireland.",
-    "Amber": "Amber alert: possible aurora. Aurora is likely to be visible by eye from Scotland, "
-    "northern England and Northern Ireland possibly visible from elsewhere in the UK. "
-    "Photographs of aurora are likely from anywhere in the UK.",
-    "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye and camera "
-    "from anywhere in the UK."}
