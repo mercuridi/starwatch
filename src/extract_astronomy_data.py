@@ -1,5 +1,6 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
 import os
+import json
 from datetime import datetime, timedelta
 from typing import Dict
 
@@ -32,12 +33,12 @@ def check_data_in_tables(conn: psycopg2.extensions.connection) -> bool:
     Returns True if tables have data - false if tables are empty"""
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM forecast;
     """)
     forecast_count = cursor.fetchone()[0]
     cursor.execute("""
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM distance;
     """)
     distance_count = cursor.fetchone()[0]
@@ -50,17 +51,21 @@ def get_date_range(conn) -> Dict[str, datetime.date]:
     Otherwise, 1 day of data starting 7 days in advance.
     """
     today = datetime.now().date()
-    date_week_from_now = today + timedelta(days=6)
+    date_week_from_now = today + timedelta(days=7)
 
     if check_data_in_tables(conn):
-        return {
+        date_range = {
             "start": date_week_from_now,
-            "end": date_week_from_now + timedelta(days=1)
+            "end": date_week_from_now
         }
-    return {
-        "start": today,
-        "end": date_week_from_now
-    }
+    else:
+        date_range = {
+            "start": today,
+            "end": today + timedelta(days=7)
+        }
+
+    print(f"Downloaded data from {date_range['start']} to {date_range['end']}")
+    return date_range
 
 
 def get_planetary_positions(
@@ -125,3 +130,6 @@ if __name__ == "__main__":
         get_date_range(connection),
         make_request_headers()
     )
+
+    with open('astronomy_test_data.json', 'w', encoding="utf8") as f:
+        json.dump(data, f, indent=2)
