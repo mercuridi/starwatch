@@ -14,8 +14,8 @@ RUN yum install -y gcc
 RUN pip install -r requirements.txt
 RUN yum clean all
 
-RUN mkdir src
 # Copy only the files you need into src/
+RUN mkdir src
 COPY src/__init__.py                 src/
 COPY src/extract_astronomy_data.py   src/
 COPY src/transform_astronomy_data.py src/
