@@ -13,4 +13,8 @@ sqlalchemy
 psycopg2-binary
 streamlit
 freezegun
+<<<<<<< HEAD
 requests-mock
+=======
+xmltodict
+>>>>>>> a0890be5d6ff4ed5fa43dffffb41b76bca2e1d26
