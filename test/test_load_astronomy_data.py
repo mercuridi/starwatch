@@ -1,7 +1,6 @@
 # pylint: skip-file
 import pandas as pd
 from unittest.mock import MagicMock, patch
-from sqlalchemy.engine import Engine
 
 from src.load_astronomy_data import (
     get_db_connection,
