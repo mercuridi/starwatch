@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_execution" {
 
 # Security group for Lambda
 resource "aws_security_group" "lambda_sg" {
-  name        = "c18-starwatch-lambda-sg"
+  name        = "c18-starwatch-astronomy-lambda-sg"
   description = "Allow Lambda to connect to RDS SQL Server"
   vpc_id      = var.vpc_id
 
@@ -52,14 +52,18 @@ resource "aws_lambda_function" "image_lambda" {
   timeout       = 120
   memory_size   = 512
 
+  architectures = ["arm64"]
+
   environment {
     variables = {
-      DB_HOST     = var.DB_HOST
-      DB_PORT     = var.DB_PORT
-      DB_USER     = var.DB_USER
-      DB_PASSWORD = var.DB_PASSWORD
-      DB_NAME     = var.DB_NAME
-      DB_SCHEMA   = var.DB_SCHEMA
+    DB_HOST               = var.DB_HOST
+      DB_PORT             = var.DB_PORT
+      DB_USER             = var.DB_USER
+      DB_PASSWORD         = var.DB_PASSWORD
+      DB_NAME             = var.DB_NAME
+      DB_SCHEMA           = var.DB_SCHEMA
+      APPLICATION_ID      = var.APPLICATION_ID
+      APPLICATION_SECRET  = var.APPLICATION_SECRET
     }
   }
   vpc_config {
@@ -104,8 +108,8 @@ resource "aws_scheduler_schedule" "lambda_every_minute" {
   group_name = "default"
 
   # change below settings as needed
-  schedule_expression = "rate(1 minute)"
-  state               = "DISABLED"  # Change to ENABLED once ready
+  schedule_expression = "rate(1 day)"
+  state               = "ENABLED"  # Change to ENABLED once ready
 
   flexible_time_window {
     mode = "OFF"

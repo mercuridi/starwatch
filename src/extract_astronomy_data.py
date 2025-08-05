@@ -2,12 +2,13 @@
 import os
 import json
 from datetime import datetime, timedelta
+from typing import Dict
 
 import psycopg2
 import requests
 from dotenv import load_dotenv
 
-import src.astronomy_utils
+from src.astronomy_utils import make_request_headers
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
@@ -16,10 +17,10 @@ def get_db_connection() -> psycopg2.extensions.connection:
     """
     try:
         conn_string = f"""
-        host='{os.environ.get("DB_HOST")}'
-        dbname='{os.environ["DB_NAME"]}'
-        user='{os.environ["DB_USER"]}'
-        password='{os.environ["DB_PASSWORD"]}'
+        host='{os.getenv("DB_HOST")}'
+        dbname='{os.getenv("DB_NAME")}'
+        user='{os.getenv("DB_USER")}'
+        password='{os.getenv("DB_PASSWORD")}'
         """
         return psycopg2.connect(conn_string)
 
@@ -44,7 +45,7 @@ def check_data_in_tables(conn: psycopg2.extensions.connection) -> bool:
     return forecast_count > 0 and distance_count > 0
 
 
-def get_date_range(conn) -> dict[str, datetime.date]:
+def get_date_range(conn) -> Dict[str, datetime.date]:
     """Determines the date period for which data is downloaded. 
     7 days worth of data if the db is empty;
     Otherwise, 1 day of data starting 7 days in advance.
@@ -68,11 +69,11 @@ def get_date_range(conn) -> dict[str, datetime.date]:
 
 
 def get_planetary_positions(
-    coordinates: dict[str:float],
-    dates: dict[str:datetime.date],
-    header: dict[str:str],
+    coordinates: Dict[str, float],
+    dates: Dict[str, datetime.date],
+    header: Dict[str, str],
     time: str=str(datetime.now().time().strftime("%H:%M:%S"))
-) -> dict:
+) -> Dict:
     '''
     Gets information on planetary bodies from current day
     to next 7 days and saves it to a file as JSON
@@ -97,8 +98,8 @@ def get_planetary_positions(
 
 
 def get_positions_url(
-    coordinates: dict[str:float],
-    dates: dict[str:datetime.date],
+    coordinates: Dict[str, float],
+    dates: Dict[str, datetime.date],
     time: str
 ) -> str:
     """Constructs the API endpoint for the planetary positions data"""
@@ -127,7 +128,7 @@ if __name__ == "__main__":
             "lon": -00.05
         },
         get_date_range(connection),
-        src.astronomy_utils.make_request_headers()
+        make_request_headers()
     )
 
     with open('astronomy_test_data.json', 'w', encoding="utf8") as f:
