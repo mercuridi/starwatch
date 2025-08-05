@@ -1,5 +1,6 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
 import os
+import json
 from datetime import datetime, timedelta
 
 import psycopg2
@@ -15,10 +16,10 @@ def get_db_connection() -> psycopg2.extensions.connection:
     """
     try:
         conn_string = f"""
-        host='{os.environ.get("db_host")}'
-        dbname='{os.environ["db_name"]}'
-        user='{os.environ["db_username"]}'
-        password='{os.environ["db_password"]}'
+        host='{os.environ.get("DB_HOST")}'
+        dbname='{os.environ["DB_NAME"]}'
+        user='{os.environ["DB_USER"]}'
+        password='{os.environ["DB_PASSWORD"]}'
         """
         return psycopg2.connect(conn_string)
 
@@ -128,3 +129,6 @@ if __name__ == "__main__":
         get_date_range(connection),
         src.astronomy_utils.make_request_headers()
     )
+
+    with open('astronomy_test_data.json', 'w', encoding="utf8") as f:
+        json.dump(data, f, indent=2)
