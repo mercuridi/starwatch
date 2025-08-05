@@ -11,7 +11,7 @@ from sqlalchemy import create_engine, text, Engine
 import pandas as pd
 from dotenv import load_dotenv
 
-from transform_astronomy_data import get_json_data, filter_data
+from src.transform_astronomy_data import get_json_data, filter_data
 
 FILE_PATH = "../data/planetary_data.json"
 
