@@ -1,4 +1,5 @@
-"""Extract script for aurora activity and relevant metadata"""
+"""Mini pipeline script to extract and transform the aurora activity data, 
+ready to be loaded on to the dashboard"""
 
 import xmltodict
 import requests
@@ -14,9 +15,11 @@ STATUS_DESCRIPTION_URL = "http://aurorawatch-api.lancs.ac.uk/0.2/status-descript
 def extract_status_descriptions(status_description_url: str) -> dict:
     """Returns dictionary of relevant status description data from the API response"""
 
-    response = requests.get(status_description_url, timeout=10)
+    response = requests.get(status_description_url, timeout=20)
     if response.status_code != 200:
-        raise RuntimeError("Unable to retrieve status description data")
+        raise RuntimeError(
+            "Unable to retrieve status description data. "
+            f"Error {response.status_code}: {response.text}")
 
     status_descriptions_dict = xmltodict.parse(response.content)
 
@@ -39,15 +42,33 @@ def extract_status_description_for_colour(status_descriptions_dict: dict, colour
     return {colour: f"{description}: {meaning}"}
 
 
-
 def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     """Returns dataframe of recent aurora activity data from the API response"""
 
-    response = requests.get(activity_data_url, timeout=10)
+    response = requests.get(activity_data_url, timeout=20)
     if response.status_code != 200:
-        raise RuntimeError("Unable to retrieve activity data")
+        raise RuntimeError("Unable to retrieve activity data. "
+                           f"Error {response.status_code}: {response.text}")
 
     activity_dict = xmltodict.parse(response.content)
     activity_data = activity_dict.get("site_activity").get("activity")
 
     return pd.DataFrame(activity_data)
+
+
+
+def find_most_recent_status_info(status_descriptions: dict,
+                                activity_data: pd.DataFrame) -> tuple[str, str, str]:
+    """Returns the status colour, status description, and the date and time of the status"""
+
+    most_recent_aurora_activity = activity_data.tail(1)
+
+    most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title()
+    most_recent_status_description = status_descriptions[most_recent_colour]
+
+    datetime = most_recent_aurora_activity["datetime"].values[0]
+    datetime_list = datetime.split("T")
+    date = datetime_list[0]
+    time = datetime_list[1].split("+")[0]
+
+    return most_recent_colour, most_recent_status_description, f"{time} {date}"
