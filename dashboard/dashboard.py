@@ -2,7 +2,7 @@
 
 # pylint:disable=import-error
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import streamlit as st
 import pandas as pd
@@ -25,7 +25,14 @@ from src.moon_phase_extract import get_moon_phase_image
 
 from src.aurora_etl import extract_activity_data, find_most_recent_status_info
 
+from src.extract_nasa import get_image_details, get_neos
+
 AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
+
+APOD_URL = "https://api.nasa.gov/planetary/apod"
+
+TODAY = str(date.today())
+
 
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
@@ -387,7 +394,7 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "and camera from anywhere in the UK."}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
-                                                                                activity_data)
+                                                                         activity_data)
 
     st.subheader(
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
@@ -400,29 +407,73 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         st.markdown(f"{description}")
 
 
+def display_APOD():
+    """Displays the Astronomy Picture of the Day, it's title and an explanation from NASA
+
+    If there's no image for the day, displays no image today message to the user"""
+
+    api_key = os.environ.get("API_KEY")
+
+    apod_params = {
+        "api_key": api_key,
+        "date": TODAY
+    }
+
+    try:
+        title, explanation, url = get_image_details(APOD_URL, apod_params)
+
+        st.markdown(
+            "Discover a new image each day of our fascinating universe (Sourced from NASA). "
+            "Each image includes an explanation from a professional astronomer!")
+        st.subheader(f"{title}", divider="blue")
+        st.image(url)
+        st.subheader("Image Explanation", divider="blue")
+        st.markdown(explanation)
+
+    except ValueError:
+        st.markdown(
+            "No Picture of the Day today! Please check back tomorrow"
+        )
+
+
+def display_NEOs():
+    """Displays the day's Near-Earth objects and their associated metrics"""
+
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
-    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
+    home, apod, neo = st.tabs(
+        ["Home", "Astronomy Picture of the Day", "Near-Earth Objects"])
 
-    engine = get_db_connection()
-    all_planetary_data = get_all_data(engine)
-    display_planetary_body_data(all_planetary_data)
+    with home:
+        st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
-    try:
-        aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
-        display_aurora_data(aurora_data)
-    except RuntimeError:
-        st.markdown("Aurora data not currently available")
+        engine = get_db_connection()
+        all_planetary_data = get_all_data(engine)
+        display_planetary_body_data(all_planetary_data)
 
-    st.header(
-        ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
-        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: "
-        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
-        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
+        try:
+            aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
+            display_aurora_data(aurora_data)
+        except RuntimeError:
+            st.markdown("Aurora data not currently available")
 
-    weather_section()
+        st.header(
+            ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
+            ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: "
+            ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
+            ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
+
+        weather_section()
+
+    with apod:
+        st.title("Astronomy Picture of the Day")
+
+        display_APOD()
+
+    with neo:
+        st.title("Near-Earth Objects")
 
 
 if __name__ == "__main__":
