@@ -75,6 +75,7 @@ def test_find_most_recent_status_info_returns_tuple_correct_len():
     assert len(status_info) == 3
 
 
+
 def test_find_most_recent_status_info_correct_data():
     status_description_dict = {
         "Green": "No significant activity. Aurora is unlikely to be visible by "

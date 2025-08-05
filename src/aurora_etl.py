@@ -61,7 +61,7 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
 def find_most_recent_status_info(status_descriptions: dict,
                                 activity_data: pd.DataFrame) -> tuple[str, str, str]:
     """Returns the status colour, status description, and the date and time of the status"""
-    
+
     most_recent_aurora_activity = activity_data.tail(1)
 
     most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title()
