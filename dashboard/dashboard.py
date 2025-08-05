@@ -190,13 +190,6 @@ def weather_section() -> None:
     latitude = region_lat_long["latitude"].values[0]
     longitude = region_lat_long["longitude"].values[0]
 
-    # Runs the moon phase API call and saves image in data
-    get_moon_phase_image(
-        latitude,
-        longitude,
-        str(datetime.now().date()),
-        src.astronomy_utils.make_request_headers()
-    )
     col1, col2 = st.columns([1, 2])
 
     with col1:
@@ -204,9 +197,18 @@ def weather_section() -> None:
         st.markdown(f"**Region:** {region_option}")
         st.markdown(f"**Date:** {datetime.now().date()}")
 
+    moon_phase_url = "https://api.astronomyapi.com/api/v2/studio/moon-phase"
+
+    # Runs the moon phase API call and returns image
     with col2:
         st.image(
-            'data/moon_phase.jpg'
+            get_moon_phase_image(
+                latitude,
+                longitude,
+                str(datetime.now().date()),
+                src.astronomy_utils.make_request_headers(),
+                moon_phase_url
+            )
         )
 
     st.subheader("Current Weather Stats", divider="blue")
