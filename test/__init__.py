@@ -1,0 +1,1 @@
+"""Defines test as its own module in the project"""
