@@ -3,10 +3,10 @@ import datetime
 
 from dotenv import load_dotenv
 
-from extract_astronomy_data import get_db_connection, get_planetary_positions, get_date_range
-from transform_astronomy_data import filter_data
-from load_astronomy_data import main
-from astronomy_utils import make_request_headers
+from src.extract_astronomy_data import get_db_connection, get_planetary_positions, get_date_range
+from src.transform_astronomy_data import filter_data
+from src.load_astronomy_data import main
+from src.astronomy_utils import make_request_headers
 
 def run_pipeline():
     """Runs the astronomy pipeline from start to finish"""

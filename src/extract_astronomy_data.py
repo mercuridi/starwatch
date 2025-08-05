@@ -8,7 +8,7 @@ import psycopg2
 import requests
 from dotenv import load_dotenv
 
-from astronomy_utils import make_request_headers
+from src.astronomy_utils import make_request_headers
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
