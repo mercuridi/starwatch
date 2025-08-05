@@ -371,18 +371,23 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
 
 
 def display_aurora_data(activity_data: pd.DataFrame) -> None:
+    """Displays aurora data, including the status colour, a description of the meaning of the
+    status colour, and time that the status was created.
+    """
+
     status_description_dict = {
         "Green": "No significant activity. Aurora is unlikely to be visible by "
         "eye or camera from anywhere in the UK.",
-        "Yellow": "Minor geomagnetic activity. Aurora may be visible by eye from "
-        "Scotland and may be visible by camera from Scotland, northern England and Northern Ireland.",
-        "Amber": "Amber alert: possible aurora. Aurora is likely to be visible by eye from Scotland, "
-        "northern England and Northern Ireland possibly visible from elsewhere in the UK. "
-        "Photographs of aurora are likely from anywhere in the UK.",
-        "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye and camera "
-        "from anywhere in the UK."}
+        "Yellow": "Minor geomagnetic activity. Aurora may be visible by eye from Scotland "
+        "and may be visible by camera from Scotland, northern England and Northern Ireland.",
+        "Amber": "Amber alert: possible aurora. Aurora is likely to be visible by eye from "
+        "Scotland, northern England and Northern Ireland possibly visible from elsewhere in "
+        "the UK. Photographs of aurora are likely from anywhere in the UK.",
+        "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye "
+        "and camera from anywhere in the UK."}
 
-    status_colour, status_description, date_time = find_most_recent_status_info(status_description_dict, activity_data)
+    status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
+                                                                                activity_data)
 
     st.subheader(
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
@@ -391,9 +396,9 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
     a.metric("Status Colour", status_colour, border=True)
     b.metric("Time of Status", date_time, border=True)
 
-    with st.expander("Description"): 
-        st.markdown(f"{status_description}")
-    
+    with st.expander("Description"):
+        st.markdown(f"{description}")
+
 
 
 def main() -> None:
@@ -404,10 +409,12 @@ def main() -> None:
     engine = get_db_connection()
     all_planetary_data = get_all_data(engine)
     display_planetary_body_data(all_planetary_data)
-    
 
-    aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
-    display_aurora_data(aurora_data)
+    try:
+        aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
+        display_aurora_data(aurora_data)
+    except RuntimeError:
+        st.markdown("Aurora data not currently available")
 
     st.header(
         ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
