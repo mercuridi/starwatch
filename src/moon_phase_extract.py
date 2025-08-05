@@ -4,11 +4,12 @@ Returns the image
 '''
 
 # pylint:disable=import-error
+import src.astronomy_utils
 import os
 from datetime import datetime
 import requests
-
-import src.astronomy_utils
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def get_moon_phase_image(
