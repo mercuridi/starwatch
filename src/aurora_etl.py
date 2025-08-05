@@ -1,4 +1,5 @@
-"""Mini pipeline script to extract and transform the aurora activity data, ready to be loaded on to the dashboard"""
+"""Mini pipeline script to extract and transform the aurora activity data, 
+ready to be loaded on to the dashboard"""
 
 import xmltodict
 import requests
@@ -56,7 +57,8 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
 
 
 
-def find_most_recent_status_info(status_descriptions: dict, activity_data: pd.DataFrame) -> tuple[str, str, str]:
+def find_most_recent_status_info(status_descriptions: dict,
+                                activity_data: pd.DataFrame) -> tuple[str, str, str]:
     """Returns the status colour, status description, and the date and time of the status"""
 
     most_recent_aurora_activity = activity_data.tail(1)
@@ -76,7 +78,7 @@ def find_most_recent_status_info(status_descriptions: dict, activity_data: pd.Da
 # - this should make the dashboard more efficient as status descriptions don't rely on an API call
 
 # Not sure if this should be left here or copied into the dashboard script
-status_descriptions = {
+status_description_dict = {
     "Green": "No significant activity. Aurora is unlikely to be visible by "
     "eye or camera from anywhere in the UK.",
     "Yellow": "Minor geomagnetic activity. Aurora may be visible by eye from "
@@ -86,4 +88,3 @@ status_descriptions = {
     "Photographs of aurora are likely from anywhere in the UK.",
     "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye and camera "
     "from anywhere in the UK."}
-
