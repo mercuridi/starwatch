@@ -62,4 +62,4 @@ def get_moon_phase_image(
         return img_data
 
     except Exception as e:
-        print(f"Error, failed to download moon phase image: {e}")
+        print(f"Error, failed to return moon phase image: {e}")
