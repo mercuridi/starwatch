@@ -1,10 +1,11 @@
 """Mini pipeline script to extract and transform the aurora activity data, 
 ready to be loaded on to the dashboard"""
 
+from datetime import datetime
+
 import xmltodict
 import requests
 import pandas as pd
-
 
 ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
 
@@ -66,9 +67,9 @@ def find_most_recent_status_info(status_descriptions: dict,
     most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title()
     most_recent_status_description = status_descriptions[most_recent_colour]
 
-    datetime = most_recent_aurora_activity["datetime"].values[0]
-    datetime_list = datetime.split("T")
-    date = datetime_list[0]
-    time = datetime_list[1].split("+")[0]
+    # Convert datetime data into more readable format
+    date_time = most_recent_aurora_activity["datetime"].values[0]
+    datetime_obj = datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S%z")
+    datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
 
-    return most_recent_colour, most_recent_status_description, f"{time} {date}"
+    return most_recent_colour, most_recent_status_description, datetime_str

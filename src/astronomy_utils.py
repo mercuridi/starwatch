@@ -1,6 +1,7 @@
 """Utilities file for proper namespace hygiene"""
 import os
 import base64
+from typing import Dict
 
 DATA_FILEPATH = '../data/'
 
@@ -15,7 +16,7 @@ def construct_astronomy_api_auth() -> str:
     auth_string = base64.b64encode(user_pass.encode()).decode()
     return auth_string
 
-def make_request_headers() -> dict[str:str]:
+def make_request_headers() -> Dict[str, str]:
     """
     WARN!!! Assumes the .env is loaded and has values for:
         - APPLICATION_ID
