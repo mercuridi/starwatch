@@ -89,4 +89,4 @@ if __name__ == "__main__":
     }
 
     get_image_details(APOD_URL, apod_params)
-    get_neos(NEO_URL, neo_params, TODAY)
+    print(get_neos(NEO_URL, neo_params, TODAY))
