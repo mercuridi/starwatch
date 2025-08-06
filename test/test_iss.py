@@ -1,7 +1,7 @@
 # pylint: skip-file
 
 from unittest.mock import MagicMock
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 import pytest
@@ -12,7 +12,7 @@ from src.iss_etl import get_iss_lat_long_now, get_passes, present_iss_passes
 LONDON_LAT = +51.30
 LONDON_LON = -00.05
 STATIC_TIMESTAMP=1754469547
-STATIC_DATETIME=datetime.fromtimestamp(STATIC_TIMESTAMP)
+STATIC_DATETIME=datetime.fromtimestamp(STATIC_TIMESTAMP, tz=timezone.utc)
 
 @pytest.fixture
 def tle_fix():
@@ -43,6 +43,7 @@ def test_lat_long_fail(mocker):
 
 @freezegun.freeze_time(STATIC_DATETIME)
 def test_get_passes(mocker, tle_fix):
+    print(STATIC_DATETIME)
     req_mock = MagicMock(spec=requests.Response)
     req_mock.status_code = 200
     req_mock.text = tle_fix
