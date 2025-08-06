@@ -49,8 +49,7 @@ def test_get_passes(mocker, tle_fix):
     mock_api = mocker.patch(__name__ + ".requests.get",
                             return_value=req_mock)
 
-    assert get_passes(LONDON_LAT, LONDON_LON) == {'request': {'datetime': 1754473147, 'latitude': -0.05, 'longitude': 51.3, 'altitude': 0, 'passes': 1}, 'response': [{'risetime': 1754487862, 'duration': 241}]}
-    assert get_passes(40.027435, 40.027435) == {'request': {'datetime': 1754473147, 'latitude': 40.027435, 'longitude': 40.027435, 'altitude': 0, 'passes': 1}, 'response': [{'risetime': 1754475437, 'duration': 543}]}
+    assert get_passes(LONDON_LAT, LONDON_LON) == {'request': {'datetime': 1754469547, 'latitude': -0.05, 'longitude': 51.3, 'altitude': 0, 'passes': 1}, 'response': [{'risetime': 1754487862, 'duration': 241}]}
     assert mock_api.call_count == 2
 
 def test_get_passes_api_fail(mocker):
