@@ -229,11 +229,11 @@ def weather_section() -> None:
 def get_db_connection() -> Engine:
     """Establish and returns connection to DB"""
     load_dotenv()
-    db_username = os.getenv("db_username")
-    db_password = os.getenv("db_password")
-    db_name = os.getenv("db_name")
-    db_port = os.getenv("db_port")
-    db_host = os.getenv("db_host")
+    db_username = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASSWORD")
+    db_name = os.getenv("DB_NAME")
+    db_port = os.getenv("DB_PORT")
+    db_host = os.getenv("DB_HOST")
 
     # String concatenation for connection url
     url = (
