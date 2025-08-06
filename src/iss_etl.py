@@ -24,14 +24,20 @@ def get_passes(lon, lat, n=1, alt=0):
         - Updated TLE source from private redis to public API
         - Updated code overall from Python 2.x to 3.13
         - Updated outdated library references to modern ones
+        - Added some basic error checking against bad inputs
     """
+    if lat < -90 or lat > 90:
+        raise ValueError(f"Latitude out of expected range: -90 < lat < 90. Got {lat}")
+    if lon < -180 or lon > 180:
+        raise ValueError(f"Longitude out of expected range: -180 < lon < 180. Got {lon}")
 
     # Get latest TLE from Ariss
-    tle_req = requests.get("https://live.ariss.org/iss.txt", timeout=15)
+    tle_req = requests.get("https://live.ariss.org/iss.txt", timeout=60)
     if tle_req.status_code == 200:
         tle_raw = tle_req.text
     else:
         raise RuntimeError("Failed to get the TLE required for ISS orbit calculation")
+    print(tle_raw)
     tle = tle_raw.split("\n")
     iss = ephem.readtle(str(tle[0]), str(tle[1]), str(tle[2]))
 
@@ -94,4 +100,4 @@ def present_iss_passes(passes_obj) -> list[tuple[str, int]]:
     return formatted_passes
 
 if __name__ == "__main__":
-    print(present_iss_passes(get_passes(40.027435, 40.027435)))
+    print(get_passes(0, 0))
