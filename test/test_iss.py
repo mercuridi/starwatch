@@ -87,6 +87,7 @@ def test_get_passes_bad_input(args):
         5
     )
 )
+@freezegun.freeze_time(STATIC_DATETIME)
 def test_present_iss_passes(mocker, tle_fix, n_param):
     req_mock = MagicMock(spec=requests.Response)
     req_mock.status_code = 200
