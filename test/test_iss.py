@@ -77,16 +77,25 @@ def test_get_passes_bad_input(args):
     with pytest.raises(ValueError):
         get_passes(args[0], args[1])        
 
-def test_present_iss_passes(mocker, tle_fix):
+@pytest.mark.parametrize(
+    'n_param',
+    (
+        1,
+        2,
+        3,
+        4,
+        5
+    )
+)
+def test_present_iss_passes(mocker, tle_fix, n_param):
     req_mock = MagicMock(spec=requests.Response)
     req_mock.status_code = 200
     req_mock.text = tle_fix
     mock_api = mocker.patch(__name__ + ".requests.get",
                             return_value=req_mock)
 
-    print(get_passes(LONDON_LAT, LONDON_LON, n=1))
-    assert len(get_passes(LONDON_LAT, LONDON_LON, n=1)) == 1
-    # assert len(get_passes(LONDON_LAT, LONDON_LON, n=2)) == 2
-    # assert len(get_passes(LONDON_LAT, LONDON_LON, n=3)) == 3
-    # assert len(get_passes(LONDON_LAT, LONDON_LON, n=4)) == 4
-    # assert len(get_passes(LONDON_LAT, LONDON_LON, n=5)) == 5
+    present_list = present_iss_passes(get_passes(LONDON_LAT, LONDON_LON, n=n_param))
+    assert len(present_list) == n_param
+    assert present_list[0][0] == '2025-08-06 13:44:22+00:00'
+    assert present_list[0][1] == 241
+    assert mock_api.call_count == 1
