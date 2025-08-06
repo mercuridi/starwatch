@@ -50,7 +50,7 @@ def test_get_passes(mocker, tle_fix):
                             return_value=req_mock)
 
     assert get_passes(LONDON_LAT, LONDON_LON) == {'request': {'datetime': 1754469547, 'latitude': -0.05, 'longitude': 51.3, 'altitude': 0, 'passes': 1}, 'response': [{'risetime': 1754487862, 'duration': 241}]}
-    assert mock_api.call_count == 2
+    assert mock_api.call_count == 1
 
 def test_get_passes_api_fail(mocker):
     req_mock = MagicMock(spec=requests.Response)
