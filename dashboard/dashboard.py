@@ -207,7 +207,7 @@ def weather_section(regions_df: pd.DataFrame, region_option: str) -> None:
 def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> None:
     """Displays the moon phase for a selected region"""
 
-    st.subheader("Moon Phase :crescent_moon:", divider="blue")
+    st.subheader("Moon Phase :full_moon:", divider="blue")
     # Gets the lat/lon of the selected region
     region_lat_long = regions_df[regions_df["region_name"] == region_option]
     latitude = region_lat_long["latitude"].values[0]
@@ -491,25 +491,10 @@ def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     st.metric("Number of Passes around Earth", region_specific[1], border=True)
 
 
-def display_moon_columns() -> None:
-    """Display moon emojis as a page break"""
-
-    a, b, c, d, e, f, g, h, i = st.columns(9)
-    a.header(":new_moon:")
-    b.header(":waning_crescent_moon:")
-    c.header(":last_quarter_moon:")
-    d.header(":waning_gibbous_moon:")
-    e.header(":full_moon:")
-    f.header(":waxing_gibbous_moon:")
-    g.header(":first_quarter_moon:")
-    h.header(":waxing_crescent_moon:")
-    i.header(":new_moon:")
-
-
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
-    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
+    st.image("dashboard/image.png")
 
     home, location, apod, neo = st.tabs(
         ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
@@ -519,8 +504,6 @@ def main() -> None:
         engine = get_db_connection()
         all_planetary_data = get_all_data(engine)
         display_planetary_body_data(all_planetary_data)
-
-        display_moon_columns()
 
         try:
             aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
@@ -540,11 +523,7 @@ def main() -> None:
 
         display_moon_phase_data(regions_df, region_option)
 
-        display_moon_columns()
-
         display_iss_data(regions_df, region_option)
-
-        display_moon_columns()
 
         weather_section(regions_df, region_option)
 
