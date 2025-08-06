@@ -37,7 +37,6 @@ def get_passes(lon, lat, n=1, alt=0):
         tle_raw = tle_req.text
     else:
         raise RuntimeError("Failed to get the TLE required for ISS orbit calculation")
-    print(tle_raw)
     tle = tle_raw.split("\n")
     iss = ephem.readtle(str(tle[0]), str(tle[1]), str(tle[2]))
 
