@@ -35,7 +35,6 @@ APOD_URL = "https://api.nasa.gov/planetary/apod"
 
 TODAY = str(date.today())
 
-
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
 
@@ -406,7 +405,6 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
     with st.expander("Description"):
         st.markdown(f"{description}")
 
-
 def display_apod() -> None:
     """Displays the Astronomy Picture of the Day, it's title and an explanation from NASA
 
@@ -484,8 +482,6 @@ def display_moon_columns() -> None:
     g.header(":first_quarter_moon:")
     h.header(":waxing_crescent_moon:")
     i.header(":new_moon:")
-
-
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
