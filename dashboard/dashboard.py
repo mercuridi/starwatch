@@ -499,7 +499,7 @@ def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
-    st.image("dashboard/image.png")
+    st.image("dashboard/banner.png", use_container_width=True)
 
     home, location, apod, neo = st.tabs(
         ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
