@@ -7,7 +7,7 @@ import ephem
 
 def get_iss_lat_long_now() -> tuple[float, float]:
     """Returns the current lat/long of the ISS as a float tuple"""
-    req = requests.get("http://api.open-notify.org/iss-now.json", timeout=15)
+    req = requests.get("http://api.open-notify.org/iss-now.json", timeout=30)
     if req.status_code == 200:
         pos = req.json()["iss_position"]
         return (pos["latitude"], pos["longitude"])
@@ -27,7 +27,7 @@ def get_passes(lon, lat, n=1, alt=0):
     """
 
     # Get latest TLE from Ariss
-    tle_req = requests.get("https://live.ariss.org/iss.txt", timeout=15)
+    tle_req = requests.get("https://live.ariss.org/iss.txt", timeout=30)
     if tle_req.status_code == 200:
         tle_raw = tle_req.text
     else:
