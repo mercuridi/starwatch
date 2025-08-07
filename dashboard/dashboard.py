@@ -207,7 +207,7 @@ def weather_section(regions_df: pd.DataFrame, region_option: str) -> None:
 def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> None:
     """Displays the moon phase for a selected region"""
 
-    st.subheader("Moon Phase :crescent_moon:", divider="blue")
+    st.subheader("Moon Phase :full_moon:", divider="blue")
     # Gets the lat/lon of the selected region
     region_lat_long = regions_df[regions_df["region_name"] == region_option]
     latitude = region_lat_long["latitude"].values[0]
@@ -393,6 +393,11 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "the UK. Photographs of aurora are likely from anywhere in the UK.",
         "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye "
         "and camera from anywhere in the UK."}
+    
+    colour_meaning = {"Green": "Unlikely",
+                        "Yellow": "Possibly",
+                        "Amber": "Likely", 
+                        "Red": "Very Likely"}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
                                                                          activity_data)
@@ -401,7 +406,7 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
 
     a, b = st.columns(2)
-    a.metric("Status Colour", status_colour, border=True)
+    a.metric("Will an aurora be visible tonight?", colour_meaning[status_colour], border=True)
     b.metric("Time of Status", date_time, border=True)
 
     with st.expander("Description"):
@@ -454,10 +459,10 @@ def display_neos() -> None:
 
         a.metric("Hazardous", "Yes" if n["hazardous"] else "No", border=True)
         b.metric("Diameter",
-                 f"{n["diameter_min_m"]} - {n["diameter_max_m"]}m", border=True)
-        c.metric("Miss Distance", f"{n["miss_distance_km"]}km", border=True)
+                 f"{n["diameter_min_m"]} - {n["diameter_max_m"]} m", border=True)
+        c.metric("Miss Distance", f"{n["miss_distance_km"]} km", border=True)
         d.metric("Relative Velocity",
-                 f"{n["relative_velocity_kmph"]}kmph", border=True)
+                 f"{n["relative_velocity_kmph"]} km/h", border=True)
 
 
 def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
@@ -505,11 +510,12 @@ def display_moon_columns() -> None:
     h.header(":waxing_crescent_moon:")
     i.header(":new_moon:")
 
+    st.metric("Number of Seconds Visible", region_specific[1], border=True)
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
-    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
+    st.image("dashboard/banner.png", use_container_width=True)
 
     home, location, apod, neo = st.tabs(
         ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
@@ -519,8 +525,6 @@ def main() -> None:
         engine = get_db_connection()
         all_planetary_data = get_all_data(engine)
         display_planetary_body_data(all_planetary_data)
-
-        display_moon_columns()
 
         try:
             aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
@@ -540,11 +544,7 @@ def main() -> None:
 
         display_moon_phase_data(regions_df, region_option)
 
-        display_moon_columns()
-
         display_iss_data(regions_df, region_option)
-
-        display_moon_columns()
 
         weather_section(regions_df, region_option)
 
