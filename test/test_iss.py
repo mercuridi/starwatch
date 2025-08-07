@@ -43,7 +43,6 @@ def test_lat_long_fail(mocker):
 
 @freezegun.freeze_time(STATIC_DATETIME)
 def test_get_passes(mocker, tle_fix):
-    print(STATIC_DATETIME)
     req_mock = MagicMock(spec=requests.Response)
     req_mock.status_code = 200
     req_mock.text = tle_fix

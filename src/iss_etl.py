@@ -99,4 +99,4 @@ def present_iss_passes(passes_obj) -> list[tuple[str, int]]:
     return formatted_passes
 
 if __name__ == "__main__":
-    print(get_passes(0, 0))
+    pass
