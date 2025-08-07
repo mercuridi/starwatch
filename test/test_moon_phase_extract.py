@@ -24,7 +24,7 @@ def test_moon_phase_calls_api(mock_post):
     mock_post.assert_called_once
 
 
-def test_moon_phase_image_invalid(capsys):
+def test_moon_phase_image_invalid():
     moon_phase_url = "https://api.astronomyapi.com/api/v2/studio/moon-phase"
     print(get_moon_phase_image(0.05, 0.14, '20i25-03-02',
                                            make_request_headers(), moon_phase_url))
