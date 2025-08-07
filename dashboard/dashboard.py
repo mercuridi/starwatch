@@ -2,7 +2,7 @@
 
 # pylint:disable=import-error
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import streamlit as st
 import pandas as pd
@@ -25,10 +25,6 @@ from src.moon_phase_extract import get_moon_phase_image
 
 from src.aurora_etl import extract_activity_data, find_most_recent_status_info
 
-<<<<<<< HEAD
-AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
-
-=======
 from src.extract_nasa import get_image_details, get_neos
 
 from src.iss_etl import get_iss_lat_long_now, get_passes, present_iss_passes
@@ -44,7 +40,6 @@ API_KEY = os.environ.get("API_KEY")
 TODAY = str(date.today())
 
 
->>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
 
@@ -398,28 +393,27 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "the UK. Photographs of aurora are likely from anywhere in the UK.",
         "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye "
         "and camera from anywhere in the UK."}
-    
+
     colour_meaning = {"Green": "Unlikely",
-                        "Yellow": "Possibly",
-                        "Amber": "Likely", 
-                        "Red": "Very Likely"}
+                      "Yellow": "Possibly",
+                      "Amber": "Likely",
+                      "Red": "Very Likely"}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
-                                                                                activity_data)
+                                                                         activity_data)
 
     st.subheader(
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
 
     a, b = st.columns(2)
-    a.metric("Will an aurora be visible tonight?", colour_meaning[status_colour], border=True)
+    a.metric("Will an aurora be visible tonight?",
+             colour_meaning[status_colour], border=True)
     b.metric("Time of Status", date_time, border=True)
 
     with st.expander("Description"):
         st.markdown(f"{description}")
 
 
-<<<<<<< HEAD
-=======
 def display_apod() -> None:
     """Displays the Astronomy Picture of the Day, it's title and an explanation from NASA
 
@@ -502,41 +496,27 @@ def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     st.metric("Time", datetime_str, border=True)
     st.metric("Number of Seconds Visible", region_specific[1], border=True)
 
->>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
-<<<<<<< HEAD
-    st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
-
-    engine = get_db_connection()
-    all_planetary_data = get_all_data(engine)
-    display_planetary_body_data(all_planetary_data)
-=======
     st.image("dashboard/banner.png", use_container_width=True)
 
     home, location, apod, neo = st.tabs(
         ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
 
     with home:
->>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 
-    try:
-        aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
-        display_aurora_data(aurora_data)
-    except RuntimeError:
-        st.markdown("Aurora data not currently available")
+        engine = get_db_connection()
+        all_planetary_data = get_all_data(engine)
+        display_planetary_body_data(all_planetary_data)
 
-    st.header(
-        ":waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
-        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon: "
-        ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
-        ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
+        try:
+            aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
+            display_aurora_data(aurora_data)
+        except RuntimeError:
+            st.markdown("Aurora data not currently available")
 
-<<<<<<< HEAD
-    weather_section()
-=======
     with location:
         st.subheader("Region Selection :world_map:", divider="blue")
         regions_df = create_regions_dataframe()
@@ -560,7 +540,6 @@ def main() -> None:
 
     with neo:
         st.title("Near-Earth Objects")
->>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 
         display_neos()
 
