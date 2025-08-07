@@ -449,7 +449,7 @@ def display_neos() -> None:
         "api_key": API_KEY
     }
     data = get_neos(NEO_URL, neo_params, TODAY)
-    st.metric("Number of NEOs Today", len(data), border=True)
+    st.metric(f"Number of NEOs Today", len(data), border=True)
 
     for n in data:
         st.subheader(f"Object Name: {n["name"]}")
@@ -493,24 +493,8 @@ def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
 
     st.metric("Time", datetime_str, border=True)
-    st.metric("Number of Passes around Earth", region_specific[1], border=True)
-
-
-def display_moon_columns() -> None:
-    """Display moon emojis as a page break"""
-
-    a, b, c, d, e, f, g, h, i = st.columns(9)
-    a.header(":new_moon:")
-    b.header(":waning_crescent_moon:")
-    c.header(":last_quarter_moon:")
-    d.header(":waning_gibbous_moon:")
-    e.header(":full_moon:")
-    f.header(":waxing_gibbous_moon:")
-    g.header(":first_quarter_moon:")
-    h.header(":waxing_crescent_moon:")
-    i.header(":new_moon:")
-
     st.metric("Number of Seconds Visible", region_specific[1], border=True)
+
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
