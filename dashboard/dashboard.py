@@ -25,8 +25,26 @@ from src.moon_phase_extract import get_moon_phase_image
 
 from src.aurora_etl import extract_activity_data, find_most_recent_status_info
 
+<<<<<<< HEAD
 AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
 
+=======
+from src.extract_nasa import get_image_details, get_neos
+
+from src.iss_etl import get_iss_lat_long_now, get_passes, present_iss_passes
+
+AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
+
+APOD_URL = "https://api.nasa.gov/planetary/apod"
+
+NEO_URL = "https://api.nasa.gov/neo/rest/v1/feed"
+
+API_KEY = os.environ.get("API_KEY")
+
+TODAY = str(date.today())
+
+
+>>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 def create_regions_dataframe() -> pd.DataFrame:
     """Returns dataframe containing lat/long pairs for all regions of the UK"""
 
@@ -80,7 +98,7 @@ def create_regions_dataframe() -> pd.DataFrame:
 
 def create_response_for_region(region_name: str, regions: pd.DataFrame,
                                weather_client: openmeteo_requests.Client) -> WeatherApiResponse:
-    """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing 
+    """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing
     latitude and longitude pairs for each region), and an Open-Meteo requests client.
     """
 
@@ -163,17 +181,8 @@ def display_daily_graphs(daily_data: pd.DataFrame) -> None:
                          y="Sunset")
 
 
-def weather_section() -> None:
+def weather_section(regions_df: pd.DataFrame, region_option: str) -> None:
     """Weather section of the dashboard, with selectable region"""""
-
-    st.subheader("Region Selection :world_map:", divider="blue")
-    regions_df = create_regions_dataframe()
-    region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
-                                                      "East of England", "London",
-                                                      "North East & Cumbria", "North West",
-                                                      "Northern Ireland", "Scotland",
-                                                      "South East", "South West",
-                                                      "West Midlands", "Yorkshire & the Humber"])
 
     # Cache weather data for 15 minutes
     weather_client = get_client(cache_expiry=900)
@@ -189,6 +198,21 @@ def weather_section() -> None:
     transform_hourly_weather = transform_hourly_data(extract_hourly_weather)
     transform_daily_weather = transform_daily_data(extract_daily_weather)
 
+    st.subheader("Current Weather Stats", divider="blue")
+    display_current_weather_metrics(
+        transform_current_weather, transform_daily_weather)
+
+    st.subheader("24 Hour Weather Forecast", divider="blue")
+    display_hourly_graphs(transform_hourly_weather)
+
+    st.subheader("Weekly Weather Forecast", divider="blue")
+    display_daily_graphs(transform_daily_weather)
+
+
+def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> None:
+    """Displays the moon phase for a selected region"""
+
+    st.subheader("Moon Phase :full_moon:", divider="blue")
     # Gets the lat/lon of the selected region
     region_lat_long = regions_df[regions_df["region_name"] == region_option]
     latitude = region_lat_long["latitude"].values[0]
@@ -197,7 +221,6 @@ def weather_section() -> None:
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.markdown("### 🌓 Moon Phase")
         st.markdown(f"**Region:** {region_option}")
         st.markdown(f"**Date:** {datetime.now().date()}")
 
@@ -214,16 +237,6 @@ def weather_section() -> None:
                 moon_phase_url
             )
         )
-
-    st.subheader("Current Weather Stats", divider="blue")
-    display_current_weather_metrics(
-        transform_current_weather, transform_daily_weather)
-
-    st.subheader("24 Hour Weather Forecast", divider="blue")
-    display_hourly_graphs(transform_hourly_weather)
-
-    st.subheader("Weekly Weather Forecast", divider="blue")
-    display_daily_graphs(transform_daily_weather)
 
 
 def get_db_connection() -> Engine:
@@ -385,6 +398,11 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "the UK. Photographs of aurora are likely from anywhere in the UK.",
         "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye "
         "and camera from anywhere in the UK."}
+    
+    colour_meaning = {"Green": "Unlikely",
+                        "Yellow": "Possibly",
+                        "Amber": "Likely", 
+                        "Red": "Very Likely"}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
                                                                                 activity_data)
@@ -393,22 +411,116 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
 
     a, b = st.columns(2)
-    a.metric("Status Colour", status_colour, border=True)
+    a.metric("Will an aurora be visible tonight?", colour_meaning[status_colour], border=True)
     b.metric("Time of Status", date_time, border=True)
 
     with st.expander("Description"):
         st.markdown(f"{description}")
 
 
+<<<<<<< HEAD
+=======
+def display_apod() -> None:
+    """Displays the Astronomy Picture of the Day, it's title and an explanation from NASA
+
+    If there's no image for the day, displays no image today message to the user"""
+
+    apod_params = {
+        "api_key": API_KEY,
+        "date": TODAY
+    }
+
+    try:
+        title, explanation, url = get_image_details(APOD_URL, apod_params)
+
+        st.markdown(
+            "Discover a new image each day of our fascinating universe (Sourced from NASA). "
+            "Each image includes an explanation from a professional astronomer!")
+        st.subheader(f"{title}", divider="blue")
+        st.image(url)
+        st.subheader("Image Explanation", divider="blue")
+        st.markdown(explanation)
+
+    except ValueError:
+        st.markdown(
+            "No Picture of the Day today! Please check back tomorrow"
+        )
+
+
+def display_neos() -> None:
+    """Displays the day's Near-Earth objects and their associated metrics"""
+
+    neo_params = {
+        "start_date": TODAY,
+        "end_date": TODAY,
+        "api_key": API_KEY
+    }
+    data = get_neos(NEO_URL, neo_params, TODAY)
+    st.metric(f"Number of NEOs Today", len(data), border=True)
+
+    for n in data:
+        st.subheader(f"Object Name: {n["name"]}")
+
+        a, b = st.columns(2)
+        c, d = st.columns(2)
+
+        a.metric("Hazardous", "Yes" if n["hazardous"] else "No", border=True)
+        b.metric("Diameter",
+                 f"{n["diameter_min_m"]} - {n["diameter_max_m"]} m", border=True)
+        c.metric("Miss Distance", f"{n["miss_distance_km"]} km", border=True)
+        d.metric("Relative Velocity",
+                 f"{n["relative_velocity_kmph"]} km/h", border=True)
+
+
+def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
+    """Displays the current latitude and longitude of the International Space
+    Station, as well as a prediction for when it will next be overhead.
+    """
+
+    st.subheader(
+        "International Space Station :rocket:", divider="blue")
+
+    st.markdown("#### Current Location")
+    current_location = get_iss_lat_long_now()
+    a, b = st.columns(2)
+    b.metric("Latitude", current_location[0], border=True)
+    a.metric("Longitude", current_location[1], border=True)
+
+    # Gets the lat/lon of the selected region
+    region_lat_long = regions_df[regions_df["region_name"] == region_option]
+    latitude = region_lat_long["latitude"].values[0]
+    longitude = region_lat_long["longitude"].values[0]
+
+    st.markdown("#### When will the ISS be next overhead?")
+    region_specific = present_iss_passes(get_passes(
+        lat=latitude, lon=longitude))[0]
+
+    time_next_overhead = region_specific[0]
+    datetime_obj = datetime.strptime(time_next_overhead, "%Y-%m-%d %H:%M:%S%z")
+    datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
+
+    st.metric("Time", datetime_str, border=True)
+    st.metric("Number of Seconds Visible", region_specific[1], border=True)
+
+>>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
+<<<<<<< HEAD
     st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
     engine = get_db_connection()
     all_planetary_data = get_all_data(engine)
     display_planetary_body_data(all_planetary_data)
+=======
+    st.image("dashboard/banner.png", use_container_width=True)
+
+    home, location, apod, neo = st.tabs(
+        ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
+
+    with home:
+>>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
 
     try:
         aurora_data = extract_activity_data(AURORA_ACTIVITY_URL)
@@ -422,7 +534,35 @@ def main() -> None:
         ":new_moon: :waning_crescent_moon: :last_quarter_moon: :waning_gibbous_moon: "
         ":full_moon: :waxing_gibbous_moon: :first_quarter_moon: :waxing_crescent_moon:")
 
+<<<<<<< HEAD
     weather_section()
+=======
+    with location:
+        st.subheader("Region Selection :world_map:", divider="blue")
+        regions_df = create_regions_dataframe()
+        region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
+                                                          "East of England", "London",
+                                                          "North East & Cumbria", "North West",
+                                                          "Northern Ireland", "Scotland",
+                                                          "South East", "South West",
+                                                          "West Midlands", "Yorkshire & the Humber"])
+
+        display_moon_phase_data(regions_df, region_option)
+
+        display_iss_data(regions_df, region_option)
+
+        weather_section(regions_df, region_option)
+
+    with apod:
+        st.title("Astronomy Picture of the Day")
+
+        display_apod()
+
+    with neo:
+        st.title("Near-Earth Objects")
+>>>>>>> d9d6499bcd095a876dca5d7477155e0b11b5de23
+
+        display_neos()
 
 
 if __name__ == "__main__":
