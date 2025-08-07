@@ -33,6 +33,10 @@ AURORA_ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/a
 
 APOD_URL = "https://api.nasa.gov/planetary/apod"
 
+NEO_URL = "https://api.nasa.gov/neo/rest/v1/feed"
+
+API_KEY = os.environ.get("API_KEY")
+
 TODAY = str(date.today())
 
 
@@ -89,7 +93,7 @@ def create_regions_dataframe() -> pd.DataFrame:
 
 def create_response_for_region(region_name: str, regions: pd.DataFrame,
                                weather_client: openmeteo_requests.Client) -> WeatherApiResponse:
-    """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing 
+    """Returns Ocean-Meteo API response, provided with a region name, a region dataframe (containing
     latitude and longitude pairs for each region), and an Open-Meteo requests client.
     """
 
@@ -200,7 +204,6 @@ def weather_section(regions_df: pd.DataFrame, region_option: str) -> None:
     display_daily_graphs(transform_daily_weather)
 
 
-
 def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> None:
     """Displays the moon phase for a selected region"""
 
@@ -231,15 +234,14 @@ def display_moon_phase_data(regions_df: pd.DataFrame, region_option: str) -> Non
         )
 
 
-
 def get_db_connection() -> Engine:
     """Establish and returns connection to DB"""
     load_dotenv()
-    db_username = os.getenv("DB_USER")
-    db_password = os.getenv("DB_PASSWORD")
-    db_name = os.getenv("DB_NAME")
-    db_port = os.getenv("DB_PORT")
-    db_host = os.getenv("DB_HOST")
+    db_username = os.getenv("db_username")
+    db_password = os.getenv("db_password")
+    db_name = os.getenv("db_name")
+    db_port = os.getenv("db_port")
+    db_host = os.getenv("db_host")
 
     # String concatenation for connection url
     url = (
@@ -376,7 +378,6 @@ def display_planetary_body_data(data: pd.DataFrame) -> None:
         st.table(transpose_horizontal)
 
 
-
 def display_aurora_data(activity_data: pd.DataFrame) -> None:
     """Displays aurora data, including the status colour, a description of the meaning of the
     status colour, and time that the status was created.
@@ -412,10 +413,8 @@ def display_apod() -> None:
 
     If there's no image for the day, displays no image today message to the user"""
 
-    api_key = os.environ.get("API_KEY")
-
     apod_params = {
-        "api_key": api_key,
+        "api_key": API_KEY,
         "date": TODAY
     }
 
@@ -439,11 +438,31 @@ def display_apod() -> None:
 def display_neos() -> None:
     """Displays the day's Near-Earth objects and their associated metrics"""
 
+    neo_params = {
+        "start_date": TODAY,
+        "end_date": TODAY,
+        "api_key": API_KEY
+    }
+    data = get_neos(NEO_URL, neo_params, TODAY)
+    st.metric("Number of NEOs Today", len(data), border=True)
+
+    for n in data:
+        st.subheader(f"Object Name: {n["name"]}")
+
+        a, b = st.columns(2)
+        c, d = st.columns(2)
+
+        a.metric("Hazardous", "Yes" if n["hazardous"] else "No", border=True)
+        b.metric("Diameter",
+                 f"{n["diameter_min_m"]} - {n["diameter_max_m"]}m", border=True)
+        c.metric("Miss Distance", f"{n["miss_distance_km"]}km", border=True)
+        d.metric("Relative Velocity",
+                 f"{n["relative_velocity_kmph"]}kmph", border=True)
 
 
 def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     """Displays the current latitude and longitude of the International Space
-    Stattion, as well as a prediction for when it will next be overhead.
+    Station, as well as a prediction for when it will next be overhead.
     """
 
     st.subheader(
@@ -471,6 +490,7 @@ def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
     st.metric("Time", datetime_str, border=True)
     st.metric("Number of Passes around Earth", region_specific[1], border=True)
 
+
 def display_moon_columns() -> None:
     """Display moon emojis as a page break"""
 
@@ -486,14 +506,13 @@ def display_moon_columns() -> None:
     i.header(":new_moon:")
 
 
-
 def main() -> None:
     """Main function to run all necessary code for the dashboard"""
 
     st.title(":night_with_stars: :sparkles: StarWatch :sparkles: :milky_way:")
 
     home, location, apod, neo = st.tabs(
-        ["Home", "By Location","Astronomy Picture of the Day", "Near-Earth Objects"])
+        ["Home", "By Location", "Astronomy Picture of the Day", "Near-Earth Objects"])
 
     with home:
 
@@ -509,17 +528,15 @@ def main() -> None:
         except RuntimeError:
             st.markdown("Aurora data not currently available")
 
-
-
     with location:
         st.subheader("Region Selection :world_map:", divider="blue")
         regions_df = create_regions_dataframe()
         region_option = st.selectbox("Select a region:", ["Cymru Wales", "East Midlands",
-                                                      "East of England", "London",
-                                                      "North East & Cumbria", "North West",
-                                                      "Northern Ireland", "Scotland",
-                                                      "South East", "South West",
-                                                      "West Midlands", "Yorkshire & the Humber"])
+                                                          "East of England", "London",
+                                                          "North East & Cumbria", "North West",
+                                                          "Northern Ireland", "Scotland",
+                                                          "South East", "South West",
+                                                          "West Midlands", "Yorkshire & the Humber"])
 
         display_moon_phase_data(regions_df, region_option)
 
@@ -531,7 +548,6 @@ def main() -> None:
 
         weather_section(regions_df, region_option)
 
-
     with apod:
         st.title("Astronomy Picture of the Day")
 
@@ -539,6 +555,8 @@ def main() -> None:
 
     with neo:
         st.title("Near-Earth Objects")
+
+        display_neos()
 
 
 if __name__ == "__main__":
