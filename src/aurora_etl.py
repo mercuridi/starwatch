@@ -9,39 +9,6 @@ import pandas as pd
 
 ACTIVITY_URL = "http://aurorawatch-api.lancs.ac.uk/0.2.5/status/project/awn/sum-activity.xml"
 
-STATUS_DESCRIPTION_URL = "http://aurorawatch-api.lancs.ac.uk/0.2/status-descriptions.xml"
-
-
-
-def extract_status_descriptions(status_description_url: str) -> dict:
-    """Returns dictionary of relevant status description data from the API response"""
-
-    response = requests.get(status_description_url, timeout=20)
-    if response.status_code != 200:
-        raise RuntimeError(
-            "Unable to retrieve status description data. "
-            f"Error {response.status_code}: {response.text}")
-
-    status_descriptions_dict = xmltodict.parse(response.content)
-
-    return status_descriptions_dict.get("status_list").get("status")
-
-
-
-def extract_status_description_for_colour(status_descriptions_dict: dict, colour: str) -> dict:
-    """Returns a dictionary with the description and meaning for each specified colour status"""
-
-    colour = colour.title()
-    colour_order = ["Green", "Yellow", "Amber", "Red"]
-
-    # Finds index of colour in status description
-    colour_data = status_descriptions_dict[colour_order.index(colour)]
-
-    description = colour_data.get("description").get("#text")
-    meaning = colour_data.get("meaning").get("#text")
-
-    return {colour: f"{description}: {meaning}"}
-
 
 def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     """Returns dataframe of recent aurora activity data from the API response"""
@@ -57,14 +24,14 @@ def extract_activity_data(activity_data_url: str) -> pd.DataFrame:
     return pd.DataFrame(activity_data)
 
 
-
 def find_most_recent_status_info(status_descriptions: dict,
-                                activity_data: pd.DataFrame) -> tuple[str, str, str]:
+                                 activity_data: pd.DataFrame) -> tuple[str, str, str]:
     """Returns the status colour, status description, and the date and time of the status"""
 
     most_recent_aurora_activity = activity_data.tail(1)
 
-    most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title()
+    most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title(
+    )
     most_recent_status_description = status_descriptions[most_recent_colour]
 
     # Convert datetime data into more readable format
@@ -73,3 +40,10 @@ def find_most_recent_status_info(status_descriptions: dict,
     datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
 
     return most_recent_colour, most_recent_status_description, datetime_str
+
+
+def is_red_colour_status(status_colour: str) -> bool:
+    """Returns true if aurora status colour is red"""
+    if status_colour == "Red":
+        return True
+    return False
