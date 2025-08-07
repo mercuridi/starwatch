@@ -97,6 +97,3 @@ def present_iss_passes(passes_obj) -> list[tuple[str, int]]:
             iss_pass["duration"]
         ))
     return formatted_passes
-
-if __name__ == "__main__":
-    pass
