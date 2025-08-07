@@ -28,18 +28,22 @@ def find_most_recent_status_info(status_descriptions: dict,
                                  activity_data: pd.DataFrame) -> tuple[str, str, str]:
     """Returns the status colour, status description, and the date and time of the status"""
 
-    most_recent_aurora_activity = activity_data.tail(1)
+    try:
+        most_recent_aurora_activity = activity_data.tail(1)
 
-    most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title(
-    )
-    most_recent_status_description = status_descriptions[most_recent_colour]
+        most_recent_colour = most_recent_aurora_activity["@status_id"].values[0].title(
+        )
+        most_recent_status_description = status_descriptions[most_recent_colour]
 
-    # Convert datetime data into more readable format
-    date_time = most_recent_aurora_activity["datetime"].values[0]
-    datetime_obj = datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S%z")
-    datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
+        # Convert datetime data into more readable format
+        date_time = most_recent_aurora_activity["datetime"].values[0]
+        datetime_obj = datetime.strptime(date_time, "%Y-%m-%dT%H:%M:%S%z")
+        datetime_str = datetime_obj.strftime("%H:%M %p, %a %d %b")
 
-    return most_recent_colour, most_recent_status_description, datetime_str
+        return most_recent_colour, most_recent_status_description, datetime_str
+    
+    except RuntimeError:
+        raise RuntimeError("Unable to find most recent status data")
 
 
 def is_red_colour_status(status_colour: str) -> bool:

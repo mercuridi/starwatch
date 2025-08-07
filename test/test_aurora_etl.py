@@ -2,9 +2,10 @@
 
 import pytest
 import pandas as pd
+from unittest.mock import MagicMock
 
 
-from src.aurora_etl import extract_activity_data, find_most_recent_status_info
+from src.aurora_etl import extract_activity_data, find_most_recent_status_info, is_red_colour_status
 
 
 def test_extract_activity_data_returns_df_correct_len(requests_mock):
@@ -94,4 +95,23 @@ def test_find_most_recent_status_info_correct_data():
 
 
 def test_find_most_recent_status_info_handles_error():
-    ...
+    status_description_dict = {
+        "Green": "No significant activity. Aurora is unlikely to be visible by "
+        "eye or camera from anywhere in the UK."}
+    mock_activity_data = MagicMock()
+    mock_activity_data.tail.side_effect = RuntimeError()
+
+    with pytest.raises(RuntimeError):
+        find_most_recent_status_info(status_description_dict, mock_activity_data)
+
+
+def test_is_red_colour_status_true():
+    assert is_red_colour_status("Red") == True
+
+
+def test_is_red_colour_status_false():
+    assert is_red_colour_status("Green") == False
+
+
+def test_is_red_colour_status_wrong_type():
+    assert is_red_colour_status(0) == False
