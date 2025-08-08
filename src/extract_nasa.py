@@ -73,12 +73,13 @@ if __name__ == "__main__":
     load_dotenv()
 
     TODAY = str(date.today())
+    EREYESTERDAY = str(date.today()-2)
     api_key = os.environ.get("API_KEY")
 
     APOD_URL = "https://api.nasa.gov/planetary/apod"
     apod_params = {
         "api_key": api_key,
-        "date": TODAY
+        "date": EREYESTERDAY
     }
 
     NEO_URL = "https://api.nasa.gov/neo/rest/v1/feed"
