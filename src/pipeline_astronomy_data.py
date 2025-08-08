@@ -10,13 +10,6 @@ from src.load_astronomy_data import main
 from src.astronomy_utils import make_request_headers
 
 
-logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s"
-)
-
-
 def run_pipeline():
     """Runs the astronomy pipeline from start to finish"""
     logging.info("Starting pipeline")
@@ -77,5 +70,10 @@ def handler(event, context):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     load_dotenv()
     run_pipeline()

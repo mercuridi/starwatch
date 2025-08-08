@@ -4,12 +4,6 @@ import json
 import logging
 import pandas as pd
 
-logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s"
-)
-
 FILE_PATH = "../data/planetary_data.json"
 
 
@@ -85,6 +79,11 @@ def add_record(longitude, latitude, records, name, record):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     data = get_json_data(FILE_PATH)
 
     if not isinstance(data, dict):

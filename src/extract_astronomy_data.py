@@ -9,12 +9,6 @@ import psycopg2
 from dotenv import load_dotenv
 from src.astronomy_utils import make_request_headers
 
-logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s"
-)
-
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
@@ -129,6 +123,11 @@ def get_positions_url(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     load_dotenv()
     connection = get_db_connection()
 

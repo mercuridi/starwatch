@@ -13,13 +13,6 @@ import pandas as pd
 from dotenv import load_dotenv
 from src.transform_astronomy_data import get_json_data, filter_data
 
-logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(message)s"
-)
-
-
 FILE_PATH = "../data/planetary_data.json"
 
 
@@ -155,11 +148,16 @@ def upload_to_db(forecast_df: pd.DataFrame, distance_df: pd.DataFrame, engine: E
             index=False
         )
     except Exception:
-        logger.info('[ERROR] Could Not Insert Into Database')
+        logging.info('[ERROR] Could Not Insert Into Database')
 
 
 def main(data: pd.DataFrame) -> None:
     '''Bundles all functions together for one function call'''
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     load_dotenv()
 
     if not isinstance(data, pd.DataFrame):
