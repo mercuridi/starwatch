@@ -1,14 +1,14 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
+import logging
+from typing import Dict
+from datetime import datetime, timedelta
 import os
 import json
-from datetime import datetime, timedelta
-from typing import Dict
-
-import psycopg2
 import requests
+import psycopg2
 from dotenv import load_dotenv
-
 from src.astronomy_utils import make_request_headers
+
 
 def get_db_connection() -> psycopg2.extensions.connection:
     """
@@ -22,9 +22,11 @@ def get_db_connection() -> psycopg2.extensions.connection:
         user='{os.getenv("DB_USER")}'
         password='{os.getenv("DB_PASSWORD")}'
         """
+        logging.info("Connection to RDS Established")
         return psycopg2.connect(conn_string)
 
     except psycopg2.OperationalError as e:
+        logging.debug("Failed to Connect to RDS")
         raise RuntimeError(f"Database connection failed: {e}") from e
 
 
@@ -64,7 +66,8 @@ def get_date_range(conn) -> Dict[str, datetime.date]:
             "end": today + timedelta(days=7)
         }
 
-    print(f"Downloaded data from {date_range['start']} to {date_range['end']}")
+    logging.info(
+        f"Establishing Date Range from {date_range['start']} to {date_range['end']}")
     return date_range
 
 
@@ -72,7 +75,7 @@ def get_planetary_positions(
     coordinates: Dict[str, float],
     dates: Dict[str, datetime.date],
     header: Dict[str, str],
-    time: str=str(datetime.now().time().strftime("%H:%M:%S"))
+    time: str = str(datetime.now().time().strftime("%H:%M:%S"))
 ) -> Dict:
     '''
     Gets information on planetary bodies from current day
@@ -92,6 +95,7 @@ def get_planetary_positions(
             f"Expected a Response object, got {type(response)}")
 
     if response.status_code == 200:
+        logging.info("Planetary Position Info Retrieved")
         return response.json()
 
     raise RuntimeError(f"Error {response.status_code}, {response.json()}")
@@ -119,11 +123,16 @@ def get_positions_url(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     load_dotenv()
     connection = get_db_connection()
 
     data = get_planetary_positions(
-        { # coordinates dict
+        {  # coordinates dict
             "lat": +51.30,
             "lon": -00.05
         },

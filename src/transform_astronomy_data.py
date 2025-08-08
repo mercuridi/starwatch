@@ -1,17 +1,21 @@
 '''Gets JSON data from specified file, filters for relevant columns and converts into dataframe'''
 
 import json
+import logging
 import pandas as pd
 
 FILE_PATH = "../data/planetary_data.json"
 
+
 def get_json_data(file_path: str) -> dict:
     '''Gets JSON from file and returns'''
     try:
+
         with open(file_path, 'r', encoding='utf-8') as file:
+            logging.info('JSON Data Retrieved')
             return json.load(file)
     except FileNotFoundError:
-        print('Error, No file found')
+        logging.info('Error, No file found')
         return {}
 
 
@@ -35,7 +39,9 @@ def filter_data(json_data: dict) -> pd.DataFrame:
             # Creates list of dictionaries of all relevant data from JSON
             add_record(longitude, latitude, records, name, record)
 
+    logging.info('JSON Data Filtered')
     return pd.DataFrame(records)
+
 
 def add_record(longitude, latitude, records, name, record):
     """Wrapper around append line for modularisation of script"""
@@ -73,6 +79,11 @@ def add_record(longitude, latitude, records, name, record):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(message)s"
+    )
+
     data = get_json_data(FILE_PATH)
 
     if not isinstance(data, dict):
