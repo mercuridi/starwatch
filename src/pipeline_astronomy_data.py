@@ -27,6 +27,7 @@ def run_pipeline():
         make_request_headers()
     )
     extract_end = datetime.datetime.now()
+    connection.close()
     print(f"Extract done in {extract_end-extract_start}")
 
 
