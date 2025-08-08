@@ -456,7 +456,7 @@ def display_neos() -> None:
     st.metric(f"Number of NEOs Today", len(data), border=True)
 
     for n in data:
-        st.subheader(f"Object Name: {n["name"]}")
+        st.subheader(f"Object Name: {n['name']}")
 
         a, b = st.columns(2)
         c, d = st.columns(2)
