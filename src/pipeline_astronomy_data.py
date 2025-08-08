@@ -30,6 +30,7 @@ def run_pipeline():
     )
     extract_end = datetime.datetime.now()
     logging.info("Extract done in %s", extract_end-extract_start)
+    connection.close()
 
     # transform
     logging.info("Starting transform")

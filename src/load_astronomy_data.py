@@ -149,6 +149,10 @@ def upload_to_db(forecast_df: pd.DataFrame, distance_df: pd.DataFrame, engine: E
         )
     except Exception:
         logging.info('[ERROR] Could Not Insert Into Database')
+        
+    engine.connection.close()
+
+   
 
 
 def main(data: pd.DataFrame) -> None:
@@ -181,4 +185,5 @@ def main(data: pd.DataFrame) -> None:
     distance_df = make_distance_dataframe(data)
 
     upload_to_db(forecast_df, distance_df, engine)
+
     return True

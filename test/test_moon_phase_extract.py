@@ -6,7 +6,7 @@ from src.astronomy_utils import make_request_headers
 
 @patch('requests.post')
 @patch('requests.get')
-def test_moon_phase_image_gotten(mock_get, mock_post):
+def test_moon_phase_image_successfully_retrieved(mock_get, mock_post):
     mock_post_response = MagicMock()
     mock_post_response.status_code = 200
     mock_post_response.json.return_value = {
