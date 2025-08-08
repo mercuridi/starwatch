@@ -7,19 +7,28 @@ from src.extract_astronomy_data import get_db_connection, get_planetary_position
 from src.transform_astronomy_data import filter_data
 from src.load_astronomy_data import main
 from src.astronomy_utils import make_request_headers
+import logging
+
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s"
+)
+
 
 def run_pipeline():
     """Runs the astronomy pipeline from start to finish"""
-    print("Starting pipeline")
+    logging.info("Starting pipeline")
 
     # extract
-    print("Starting extract")
+    logging.info("Starting extract")
     extract_start = datetime.datetime.now()
 
     connection = get_db_connection()
 
     data = get_planetary_positions(
-        { # coordinates dict
+        {  # coordinates dict
             "lat": +51.30,
             "lon": -00.05
         },
@@ -27,11 +36,10 @@ def run_pipeline():
         make_request_headers()
     )
     extract_end = datetime.datetime.now()
-    print(f"Extract done in {extract_end-extract_start}")
-
+    logging.info(f"Extract done in {extract_end-extract_start}")
 
     # transform
-    print("Starting transform")
+    logging.info("Starting transform")
     transform_start = datetime.datetime.now()
 
     if not isinstance(data, dict):
@@ -39,29 +47,30 @@ def run_pipeline():
     if len(data) > 0:
         transformed_data = filter_data(data)
     else:
-        raise ValueError(f"Data dict (type {type(data)}) appears to be empty: {data}")
+        raise ValueError(
+            f"Data dict (type {type(data)}) appears to be empty: {data}")
 
     transform_end = datetime.datetime.now()
-    print(f"Transform done in {transform_end-transform_start}")
+    logging.info(f"Transform done in {transform_end-transform_start}")
 
     # load
-    print("Starting load")
+    logging.info("Starting load")
     load_start = datetime.datetime.now()
 
     main(transformed_data)
 
     load_end = datetime.datetime.now()
-    print(f"Load done in {load_end-load_start}")
+    logging.info(f"Load done in {load_end-load_start}")
 
-    print(f"Pipeline finished in {load_end-extract_start}")
+    logging.info(f"Pipeline finished in {load_end-extract_start}")
 
 
 def handler(event, context):
     """handler function for lambda function"""
     try:
         run_pipeline()
-        print(f"{event} : Lambda time remaining in MS:",
-              context.get_remaining_time_in_millis())
+        logging.info(f"{event} : Lambda time remaining in MS:",
+                     context.get_remaining_time_in_millis())
         return {"statusCode": 200}
     except (TypeError, ValueError, IndexError) as e:
         return {"statusCode": 500, "error": str(e)}

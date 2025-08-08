@@ -4,14 +4,21 @@ Gets planetary body, and constellation ids from the RDS and maps this to the cor
 Transforms data into 2 dataframes, one for each table insertion in RDS
 Loads these tables into forecast and distance tables in RDS
 '''
+from src.transform_astronomy_data import get_json_data, filter_data
 import os
 from typing import Tuple
 
 from sqlalchemy import create_engine, text, Engine
 import pandas as pd
 from dotenv import load_dotenv
+import logging
 
-from src.transform_astronomy_data import get_json_data, filter_data
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s"
+)
+
 
 FILE_PATH = "../data/planetary_data.json"
 
@@ -29,6 +36,7 @@ def get_db_connection() -> Engine:
         f"postgresql+psycopg2://{db_username}:{db_password}"
         + f"@{db_host}:{db_port}/{db_name}"
     )
+    logging.info("Connection Established for RDS")
     return create_engine(url)
 
 
@@ -133,18 +141,21 @@ def make_distance_dataframe(data: pd.DataFrame) -> pd.DataFrame:
 
 def upload_to_db(forecast_df: pd.DataFrame, distance_df: pd.DataFrame, engine: Engine) -> None:
     '''Upload forecast and distance dataframes to the RDS'''
-    forecast_df.to_sql(
-        name='forecast',
-        con=engine,
-        if_exists='append',
-        index=False
-    )
-    distance_df.to_sql(
-        name='distance',
-        con=engine,
-        if_exists='append',
-        index=False
-    )
+    try:
+        forecast_df.to_sql(
+            name='forecast',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+        distance_df.to_sql(
+            name='distance',
+            con=engine,
+            if_exists='append',
+            index=False
+        )
+    except Exception:
+        logger.info('[ERROR] Could Not Insert Into Database')
 
 
 def main(data: pd.DataFrame) -> None:
