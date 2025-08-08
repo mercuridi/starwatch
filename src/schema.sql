@@ -25,7 +25,8 @@ CREATE TABLE distance (
     planetary_body_id INT NOT NULL,
     date TIMESTAMP NOT NULL,
     PRIMARY KEY (distance_id),
-    FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id)
+    FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id),
+    UNIQUE(date, planetary_body_id)
 );
 
 -- Forecast table
@@ -46,7 +47,8 @@ CREATE TABLE forecast (
     azimuth_string TEXT,
     PRIMARY KEY (forecast_id),
     FOREIGN KEY (planetary_body_id) REFERENCES planetary_body(planetary_body_id),
-    FOREIGN KEY (constellation_id) REFERENCES constellation(constellation_id)
+    FOREIGN KEY (constellation_id) REFERENCES constellation(constellation_id),
+    UNIQUE(date, planetary_body_id)
 );
 
 
