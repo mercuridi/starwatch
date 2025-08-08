@@ -73,13 +73,12 @@ if __name__ == "__main__":
     load_dotenv()
 
     TODAY = str(date.today())
-    WEDNESDAY_SICK_PIC = "2025-08-06"
     api_key = os.environ.get("API_KEY")
 
     APOD_URL = "https://api.nasa.gov/planetary/apod"
     apod_params = {
         "api_key": api_key,
-        "date": WEDNESDAY_SICK_PIC
+        "date": TODAY
     }
 
     NEO_URL = "https://api.nasa.gov/neo/rest/v1/feed"

@@ -419,9 +419,12 @@ def display_apod() -> None:
 
     If there's no image for the day, displays no image today message to the user"""
 
+    WEDNESDAY_SICK_PIC = "2025-08-06"
+
+    # change back to TODAY date after presentation
     apod_params = {
         "api_key": API_KEY,
-        "date": TODAY
+        "date": WEDNESDAY_SICK_PIC
     }
 
     try:
