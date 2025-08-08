@@ -50,8 +50,7 @@ def get_moon_phase_image(
         )
         response.raise_for_status()
     except requests.RequestException as e:
-        print(f"Error, failed to fetch moon phase image URL: {e}")
-        return
+        return f"Error, failed to fetch moon phase image URL: {e}"
 
     # Convert & return image url from post request to jpg
     try:
