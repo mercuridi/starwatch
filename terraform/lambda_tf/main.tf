@@ -103,12 +103,12 @@ resource "aws_iam_role_policy" "scheduler_invoke_lambda" {
 }
 
 # EventBridge Schedule (disabled at first)
-resource "aws_scheduler_schedule" "lambda_every_minute" {
+resource "aws_scheduler_schedule" "lambda_every_day" {
   name       = "c18-starwatch-lambda-schedule"
   group_name = "default"
 
   # change below settings as needed
-  schedule_expression = "rate(1 day)"
+  schedule_expression = "cron(* * * * ? *)"
   state               = "ENABLED"  # Change to ENABLED once ready
 
   flexible_time_window {
