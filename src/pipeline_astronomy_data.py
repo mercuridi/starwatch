@@ -1,13 +1,13 @@
 """Module to pull together the full ETL pipeline for the astronomy data"""
 import datetime
 
+import logging
 from dotenv import load_dotenv
 
 from src.extract_astronomy_data import get_db_connection, get_planetary_positions, get_date_range
 from src.transform_astronomy_data import filter_data
 from src.load_astronomy_data import main
 from src.astronomy_utils import make_request_headers
-import logging
 
 
 logger = logging.getLogger()
@@ -36,7 +36,7 @@ def run_pipeline():
         make_request_headers()
     )
     extract_end = datetime.datetime.now()
-    logging.info(f"Extract done in {extract_end-extract_start}")
+    logging.info("Extract done in %s", extract_end-extract_start)
 
     # transform
     logging.info("Starting transform")
@@ -51,7 +51,7 @@ def run_pipeline():
             f"Data dict (type {type(data)}) appears to be empty: {data}")
 
     transform_end = datetime.datetime.now()
-    logging.info(f"Transform done in {transform_end-transform_start}")
+    logging.info("Transform done in %s", transform_end-transform_start)
 
     # load
     logging.info("Starting load")
@@ -60,16 +60,16 @@ def run_pipeline():
     main(transformed_data)
 
     load_end = datetime.datetime.now()
-    logging.info(f"Load done in {load_end-load_start}")
+    logging.info("Load done in %s", load_end-load_start)
 
-    logging.info(f"Pipeline finished in {load_end-extract_start}")
+    logging.info("Pipeline finished in %s", load_end-extract_start)
 
 
 def handler(event, context):
     """handler function for lambda function"""
     try:
         run_pipeline()
-        logging.info(f"{event} : Lambda time remaining in MS:",
+        logging.info("%s : Lambda time remaining in MS:", event,
                      context.get_remaining_time_in_millis())
         return {"statusCode": 200}
     except (TypeError, ValueError, IndexError) as e:

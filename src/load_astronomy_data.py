@@ -4,14 +4,14 @@ Gets planetary body, and constellation ids from the RDS and maps this to the cor
 Transforms data into 2 dataframes, one for each table insertion in RDS
 Loads these tables into forecast and distance tables in RDS
 '''
-from src.transform_astronomy_data import get_json_data, filter_data
 import os
 from typing import Tuple
 
+import logging
 from sqlalchemy import create_engine, text, Engine
 import pandas as pd
 from dotenv import load_dotenv
-import logging
+from src.transform_astronomy_data import get_json_data, filter_data
 
 logger = logging.getLogger()
 logging.basicConfig(

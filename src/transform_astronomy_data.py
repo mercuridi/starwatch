@@ -1,8 +1,8 @@
 '''Gets JSON data from specified file, filters for relevant columns and converts into dataframe'''
 
 import json
-import pandas as pd
 import logging
+import pandas as pd
 
 logger = logging.getLogger()
 logging.basicConfig(

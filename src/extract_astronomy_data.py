@@ -1,13 +1,13 @@
 '''Extracts moon phase and planetary body information from Astronomy API'''
-from src.astronomy_utils import make_request_headers
-from dotenv import load_dotenv
-import requests
-import psycopg2
+import logging
+from typing import Dict
+from datetime import datetime, timedelta
 import os
 import json
-import logging
-from datetime import datetime, timedelta
-from typing import Dict
+import requests
+import psycopg2
+from dotenv import load_dotenv
+from src.astronomy_utils import make_request_headers
 
 logger = logging.getLogger()
 logging.basicConfig(
