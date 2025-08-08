@@ -453,7 +453,7 @@ def display_neos() -> None:
         "api_key": API_KEY
     }
     data = get_neos(NEO_URL, neo_params, TODAY)
-    st.metric(f"Number of NEOs Today", len(data), border=True)
+    st.metric("Number of NEOs Today", len(data), border=True)
 
     for n in data:
         st.subheader(f"Object Name: {n['name']}")
@@ -463,10 +463,10 @@ def display_neos() -> None:
 
         a.metric("Hazardous", "Yes" if n["hazardous"] else "No", border=True)
         b.metric("Diameter",
-                 f"{n["diameter_min_m"]} - {n["diameter_max_m"]} m", border=True)
-        c.metric("Miss Distance", f"{n["miss_distance_km"]} km", border=True)
+                 f"{n['diameter_min_m']} - {n['diameter_max_m']} m", border=True)
+        c.metric("Miss Distance", f"{n['miss_distance_km']} km", border=True)
         d.metric("Relative Velocity",
-                 f"{n["relative_velocity_kmph"]} km/h", border=True)
+                 f"{n['relative_velocity_kmph']} km/h", border=True)
 
 
 def display_iss_data(regions_df: pd.DataFrame, region_option: str) -> None:
