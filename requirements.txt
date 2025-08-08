@@ -13,6 +13,6 @@ sqlalchemy
 psycopg2-binary
 streamlit
 freezegun
+requests-mock
 xmltodict
 ephem
-

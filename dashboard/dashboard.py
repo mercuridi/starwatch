@@ -393,11 +393,11 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "the UK. Photographs of aurora are likely from anywhere in the UK.",
         "Red": "Red alert: aurora likely. It is likely that aurora will be visible by eye "
         "and camera from anywhere in the UK."}
-    
+
     colour_meaning = {"Green": "Unlikely",
-                        "Yellow": "Possibly",
-                        "Amber": "Likely", 
-                        "Red": "Very Likely"}
+                      "Yellow": "Possibly",
+                      "Amber": "Likely",
+                      "Red": "Very Likely"}
 
     status_colour, description, date_time = find_most_recent_status_info(status_description_dict,
                                                                          activity_data)
@@ -406,7 +406,8 @@ def display_aurora_data(activity_data: pd.DataFrame) -> None:
         "Aurora Activity Tracker :chart_with_upwards_trend:", divider="blue")
 
     a, b = st.columns(2)
-    a.metric("Will an aurora be visible tonight?", colour_meaning[status_colour], border=True)
+    a.metric("Will an aurora be visible tonight?",
+             colour_meaning[status_colour], border=True)
     b.metric("Time of Status", date_time, border=True)
 
     with st.expander("Description"):
