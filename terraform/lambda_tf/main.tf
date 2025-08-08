@@ -108,7 +108,7 @@ resource "aws_scheduler_schedule" "lambda_every_day" {
   group_name = "default"
 
   # change below settings as needed
-  schedule_expression = "cron(* * * * ? *)"
+  schedule_expression = "cron(*/2 * * * ? *)"
   state               = "ENABLED"  # Change to ENABLED once ready
 
   flexible_time_window {
